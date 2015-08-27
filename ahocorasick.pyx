@@ -1,6 +1,6 @@
 
 from libc.stdio cimport FILE, fopen, fclose
-from libc.stdlib cimport malloc, free
+from libc.stdlib cimport malloc, free, realloc
 from libc.string cimport strlen
 from cpython.string cimport PyString_AsString
 
@@ -45,12 +45,6 @@ cdef ACISM* _build_from_memrefs(MEMREF* patterns, int num_patterns):
     return acism_create(patterns, num_patterns)
 
 
-cdef ACISM* _build_from_string(char* string, char sep='\n'):
-    cdef int num_patterns = 0
-    cdef MEMREF* patterns = refsplit(string, sep, &num_patterns)
-    return _build_from_memrefs(patterns, num_patterns)
-
-
 cdef FILE* _open_file(const char* path, const char* mode="r"):
     cdef FILE *pfp = fopen(path, mode)
     if not pfp:
@@ -62,37 +56,68 @@ cdef FILE* _open_file(const char* path, const char* mode="r"):
 # Processing
 #
 
-cdef int on_match(int strnum, int textpos, void* context):
-    print strnum, textpos
+ctypedef struct CONTEXT:
+    int*  ptr
+    size_t size
+    size_t count
+
+
+cdef int on_match(int strnum, int textpos, CONTEXT* context):
+    if context.count >= context.size:
+        context.size = context.size * 2
+        context.ptr = <int*>realloc(context.ptr, context.size * sizeof (int))
+    context.ptr[context.count] = strnum
+    context.count += 1
     return 0
 
 
 cdef class AhoCorasick:
 
     cdef ACISM* psp
+    cdef list dictionary
+
+    def __init__(self):
+        self.dictionary = []
 
     def __dealloc__(self):
         acism_destroy(self.psp)
 
     def process(self, text):
         cdef MEMREF ctext = memref(text, len(text))
-        acism_scan(self.psp, ctext, <ACISM_ACTION*>&on_match, NULL)
+
+        # Init structure to store extracted words
+        cdef CONTEXT context
+        context.ptr = <int*>malloc(50 * sizeof (int))
+        context.size = 50
+        context.count = 0
+
+        # Extract words
+        acism_scan(self.psp, ctext, <ACISM_ACTION*>&on_match, &context)
+
+        # Build list of extracted terms
+        extracted_terms = [
+            context.ptr[i]
+            for i in range(context.count)
+        ]
+        free(context.ptr)
+
+        return extracted_terms
 
     def build_from_iterable(self, strings):
         """Build AhoCorasick from an iterable of strings. """
-        cdef MEMREF* memrefs = <MEMREF *>malloc(len(strings) * sizeof(MEMREF))
+        cdef MEMREF* memrefs = <MEMREF *>malloc(len(strings) * sizeof (MEMREF))
+        self.dictionary = strings
         for i, string in enumerate(strings):
             memrefs[i].ptr = PyString_AsString(string)
             memrefs[i].len = len(string)
         self.psp = _build_from_memrefs(memrefs, len(strings))
         free(memrefs)
 
-    def build_from_string(self, string, char sep='\n'):
+    def build_from_string(self, string, sep='\n'):
         """Build string detector from `sep`-separated
         terms found in `string`. """
-        cdef char* cstring = string
-        cdef char  csep = sep
-        self.psp = _build_from_string(cstring)
+        strings = string.split(sep)
+        self.build_from_iterable(strings)
 
     def build_from_file(self, path):
         """Read a """

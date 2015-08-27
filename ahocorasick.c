@@ -457,22 +457,11 @@ static const char *__pyx_f[] = {
 
 /*--- Type declarations ---*/
 struct __pyx_obj_11ahocorasick_AhoCorasick;
-struct __pyx_opt_args_11ahocorasick__build_from_string;
 struct __pyx_opt_args_11ahocorasick__open_file;
+struct __pyx_t_11ahocorasick_CONTEXT;
+typedef struct __pyx_t_11ahocorasick_CONTEXT __pyx_t_11ahocorasick_CONTEXT;
 
 /* "ahocorasick.pyx":48
- * 
- * 
- * cdef ACISM* _build_from_string(char* string, char sep='\n'):             # <<<<<<<<<<<<<<
- *     cdef int num_patterns = 0
- *     cdef MEMREF* patterns = refsplit(string, sep, &num_patterns)
- */
-struct __pyx_opt_args_11ahocorasick__build_from_string {
-  int __pyx_n;
-  char sep;
-};
-
-/* "ahocorasick.pyx":54
  * 
  * 
  * cdef FILE* _open_file(const char* path, const char* mode="r"):             # <<<<<<<<<<<<<<
@@ -484,7 +473,20 @@ struct __pyx_opt_args_11ahocorasick__open_file {
   char const *mode;
 };
 
-/* "ahocorasick.pyx":70
+/* "ahocorasick.pyx":59
+ * #
+ * 
+ * ctypedef struct CONTEXT:             # <<<<<<<<<<<<<<
+ *     int*  ptr
+ *     size_t size
+ */
+struct __pyx_t_11ahocorasick_CONTEXT {
+  int *ptr;
+  size_t size;
+  size_t count;
+};
+
+/* "ahocorasick.pyx":74
  * 
  * 
  * cdef class AhoCorasick:             # <<<<<<<<<<<<<<
@@ -494,6 +496,7 @@ struct __pyx_opt_args_11ahocorasick__open_file {
 struct __pyx_obj_11ahocorasick_AhoCorasick {
   PyObject_HEAD
   ACISM *psp;
+  PyObject *dictionary;
 };
 
 
@@ -592,6 +595,27 @@ static void __Pyx_WriteUnraisable(const char *name, int clineno,
                                   int lineno, const char *filename,
                                   int full_traceback, int nogil);
 
+static void __Pyx_RaiseArgtupleInvalid(const char* func_name, int exact,
+    Py_ssize_t num_min, Py_ssize_t num_max, Py_ssize_t num_found);
+
+static CYTHON_INLINE int __Pyx_CheckKeywordStrings(PyObject *kwdict, const char* function_name, int kw_allowed);
+
+#if CYTHON_COMPILING_IN_CPYTHON
+static CYTHON_INLINE int __Pyx_ListComp_Append(PyObject* list, PyObject* x) {
+    PyListObject* L = (PyListObject*) list;
+    Py_ssize_t len = Py_SIZE(list);
+    if (likely(L->allocated > len)) {
+        Py_INCREF(x);
+        PyList_SET_ITEM(list, len, x);
+        Py_SIZE(list) = len+1;
+        return 0;
+    }
+    return PyList_Append(list, x);
+}
+#else
+#define __Pyx_ListComp_Append(L,x) PyList_Append(L,x)
+#endif
+
 #if CYTHON_COMPILING_IN_CPYTHON
 static PyObject* __Pyx_PyInt_AddObjC(PyObject *op1, PyObject *op2, long intval, int inplace);
 #else
@@ -605,8 +629,11 @@ static int __Pyx_ParseOptionalKeywords(PyObject *kwds, PyObject **argnames[],\
     PyObject *kwds2, PyObject *values[], Py_ssize_t num_pos_args,\
     const char* function_name);
 
-static void __Pyx_RaiseArgtupleInvalid(const char* func_name, int exact,
-    Py_ssize_t num_min, Py_ssize_t num_max, Py_ssize_t num_found);
+#if CYTHON_COMPILING_IN_CPYTHON
+static CYTHON_INLINE PyObject* __Pyx_PyObject_CallMethO(PyObject *func, PyObject *arg);
+#endif
+
+static CYTHON_INLINE PyObject* __Pyx_PyObject_CallOneArg(PyObject *func, PyObject *arg);
 
 #if CYTHON_COMPILING_IN_CPYTHON && PY_VERSION_HEX >= 0x02070000
 static CYTHON_INLINE PyObject* __Pyx_PyObject_LookupSpecial(PyObject* obj, PyObject* attr_name) {
@@ -632,12 +659,6 @@ static CYTHON_INLINE PyObject* __Pyx_PyObject_LookupSpecial(PyObject* obj, PyObj
 #else
 #define __Pyx_PyObject_LookupSpecial(o,n) __Pyx_PyObject_GetAttrStr(o,n)
 #endif
-
-#if CYTHON_COMPILING_IN_CPYTHON
-static CYTHON_INLINE PyObject* __Pyx_PyObject_CallMethO(PyObject *func, PyObject *arg);
-#endif
-
-static CYTHON_INLINE PyObject* __Pyx_PyObject_CallOneArg(PyObject *func, PyObject *arg);
 
 #if CYTHON_COMPILING_IN_CPYTHON
 static CYTHON_INLINE PyObject* __Pyx_PyObject_CallNoArg(PyObject *func);
@@ -667,15 +688,9 @@ static void __pyx_insert_code_object(int code_line, PyCodeObject* code_object);
 static void __Pyx_AddTraceback(const char *funcname, int c_line,
                                int py_line, const char *filename);
 
-static CYTHON_INLINE char __Pyx_PyInt_As_char(PyObject *);
+static CYTHON_INLINE size_t __Pyx_PyInt_As_size_t(PyObject *);
 
-static int __Pyx_Print(PyObject*, PyObject *, int);
-#if CYTHON_COMPILING_IN_PYPY || PY_MAJOR_VERSION >= 3
-static PyObject* __pyx_print = 0;
-static PyObject* __pyx_print_kwargs = 0;
-#endif
-
-static int __Pyx_PrintOne(PyObject* stream, PyObject *o);
+static CYTHON_INLINE PyObject* __Pyx_PyInt_From_int(int value);
 
 static CYTHON_INLINE PyObject* __Pyx_PyInt_From_long(long value);
 
@@ -720,64 +735,65 @@ static PyTypeObject *__pyx_ptype_7cpython_4type_type = 0;
 /* Module declarations from 'ahocorasick' */
 static PyTypeObject *__pyx_ptype_11ahocorasick_AhoCorasick = 0;
 static ACISM *__pyx_f_11ahocorasick__build_from_memrefs(MEMREF *, int); /*proto*/
-static ACISM *__pyx_f_11ahocorasick__build_from_string(char *, struct __pyx_opt_args_11ahocorasick__build_from_string *__pyx_optional_args); /*proto*/
 static FILE *__pyx_f_11ahocorasick__open_file(char const *, struct __pyx_opt_args_11ahocorasick__open_file *__pyx_optional_args); /*proto*/
-static int __pyx_f_11ahocorasick_on_match(int, int, void *); /*proto*/
+static int __pyx_f_11ahocorasick_on_match(int, int, __pyx_t_11ahocorasick_CONTEXT *); /*proto*/
 #define __Pyx_MODULE_NAME "ahocorasick"
 int __pyx_module_is_main_ahocorasick = 0;
 
 /* Implementation of 'ahocorasick' */
 static PyObject *__pyx_builtin_IOError;
+static PyObject *__pyx_builtin_range;
 static PyObject *__pyx_builtin_enumerate;
 static PyObject *__pyx_builtin_open;
+static char __pyx_k_[] = "\n";
 static char __pyx_k_r[] = "r";
 static char __pyx_k_w[] = "w";
 static char __pyx_k_rb[] = "rb";
-static char __pyx_k_end[] = "end";
 static char __pyx_k_sep[] = "sep";
 static char __pyx_k_exit[] = "__exit__";
-static char __pyx_k_file[] = "file";
 static char __pyx_k_main[] = "__main__";
 static char __pyx_k_open[] = "open";
 static char __pyx_k_read[] = "read";
 static char __pyx_k_test[] = "__test__";
-static char __pyx_k_Match[] = "Match";
 static char __pyx_k_enter[] = "__enter__";
-static char __pyx_k_print[] = "print";
+static char __pyx_k_range[] = "range";
+static char __pyx_k_split[] = "split";
 static char __pyx_k_string[] = "string";
 static char __pyx_k_IOError[] = "IOError";
 static char __pyx_k_enumerate[] = "enumerate";
 static char __pyx_k_build_from_string[] = "build_from_string";
+static char __pyx_k_build_from_iterable[] = "build_from_iterable";
 static char __pyx_k_Unable_to_open_file_s[] = "Unable to open file: %s";
+static PyObject *__pyx_kp_s_;
 static PyObject *__pyx_n_s_IOError;
-static PyObject *__pyx_n_s_Match;
 static PyObject *__pyx_kp_s_Unable_to_open_file_s;
+static PyObject *__pyx_n_s_build_from_iterable;
 static PyObject *__pyx_n_s_build_from_string;
-static PyObject *__pyx_n_s_end;
 static PyObject *__pyx_n_s_enter;
 static PyObject *__pyx_n_s_enumerate;
 static PyObject *__pyx_n_s_exit;
-static PyObject *__pyx_n_s_file;
 static PyObject *__pyx_n_s_main;
 static PyObject *__pyx_n_s_open;
-static PyObject *__pyx_n_s_print;
+static PyObject *__pyx_n_s_range;
 static PyObject *__pyx_n_s_rb;
 static PyObject *__pyx_n_s_read;
 static PyObject *__pyx_n_s_sep;
+static PyObject *__pyx_n_s_split;
 static PyObject *__pyx_n_s_string;
 static PyObject *__pyx_n_s_test;
-static void __pyx_pf_11ahocorasick_11AhoCorasick___dealloc__(struct __pyx_obj_11ahocorasick_AhoCorasick *__pyx_v_self); /* proto */
-static PyObject *__pyx_pf_11ahocorasick_11AhoCorasick_2process(struct __pyx_obj_11ahocorasick_AhoCorasick *__pyx_v_self, PyObject *__pyx_v_text); /* proto */
-static PyObject *__pyx_pf_11ahocorasick_11AhoCorasick_4build_from_iterable(struct __pyx_obj_11ahocorasick_AhoCorasick *__pyx_v_self, PyObject *__pyx_v_strings); /* proto */
-static PyObject *__pyx_pf_11ahocorasick_11AhoCorasick_6build_from_string(struct __pyx_obj_11ahocorasick_AhoCorasick *__pyx_v_self, PyObject *__pyx_v_string, char __pyx_v_sep); /* proto */
-static PyObject *__pyx_pf_11ahocorasick_11AhoCorasick_8build_from_file(struct __pyx_obj_11ahocorasick_AhoCorasick *__pyx_v_self, PyObject *__pyx_v_path); /* proto */
-static PyObject *__pyx_pf_11ahocorasick_11AhoCorasick_10dump(struct __pyx_obj_11ahocorasick_AhoCorasick *__pyx_v_self, PyObject *__pyx_v_path); /* proto */
-static PyObject *__pyx_pf_11ahocorasick_11AhoCorasick_12load(struct __pyx_obj_11ahocorasick_AhoCorasick *__pyx_v_self, PyObject *__pyx_v_path); /* proto */
-static PyObject *__pyx_pf_11ahocorasick_11AhoCorasick_14mmap(struct __pyx_obj_11ahocorasick_AhoCorasick *__pyx_v_self, PyObject *__pyx_v_path); /* proto */
+static int __pyx_pf_11ahocorasick_11AhoCorasick___init__(struct __pyx_obj_11ahocorasick_AhoCorasick *__pyx_v_self); /* proto */
+static void __pyx_pf_11ahocorasick_11AhoCorasick_2__dealloc__(struct __pyx_obj_11ahocorasick_AhoCorasick *__pyx_v_self); /* proto */
+static PyObject *__pyx_pf_11ahocorasick_11AhoCorasick_4process(struct __pyx_obj_11ahocorasick_AhoCorasick *__pyx_v_self, PyObject *__pyx_v_text); /* proto */
+static PyObject *__pyx_pf_11ahocorasick_11AhoCorasick_6build_from_iterable(struct __pyx_obj_11ahocorasick_AhoCorasick *__pyx_v_self, PyObject *__pyx_v_strings); /* proto */
+static PyObject *__pyx_pf_11ahocorasick_11AhoCorasick_8build_from_string(struct __pyx_obj_11ahocorasick_AhoCorasick *__pyx_v_self, PyObject *__pyx_v_string, PyObject *__pyx_v_sep); /* proto */
+static PyObject *__pyx_pf_11ahocorasick_11AhoCorasick_10build_from_file(struct __pyx_obj_11ahocorasick_AhoCorasick *__pyx_v_self, PyObject *__pyx_v_path); /* proto */
+static PyObject *__pyx_pf_11ahocorasick_11AhoCorasick_12dump(struct __pyx_obj_11ahocorasick_AhoCorasick *__pyx_v_self, PyObject *__pyx_v_path); /* proto */
+static PyObject *__pyx_pf_11ahocorasick_11AhoCorasick_14load(struct __pyx_obj_11ahocorasick_AhoCorasick *__pyx_v_self, PyObject *__pyx_v_path); /* proto */
+static PyObject *__pyx_pf_11ahocorasick_11AhoCorasick_16mmap(struct __pyx_obj_11ahocorasick_AhoCorasick *__pyx_v_self, PyObject *__pyx_v_path); /* proto */
 static PyObject *__pyx_tp_new_11ahocorasick_AhoCorasick(PyTypeObject *t, PyObject *a, PyObject *k); /*proto*/
 static PyObject *__pyx_int_0;
 static PyObject *__pyx_int_1;
-static PyObject *__pyx_tuple_;
+static PyObject *__pyx_tuple__2;
 
 /* "ahocorasick.pyx":44
  * #
@@ -819,69 +835,6 @@ static ACISM *__pyx_f_11ahocorasick__build_from_memrefs(MEMREF *__pyx_v_patterns
 /* "ahocorasick.pyx":48
  * 
  * 
- * cdef ACISM* _build_from_string(char* string, char sep='\n'):             # <<<<<<<<<<<<<<
- *     cdef int num_patterns = 0
- *     cdef MEMREF* patterns = refsplit(string, sep, &num_patterns)
- */
-
-static ACISM *__pyx_f_11ahocorasick__build_from_string(char *__pyx_v_string, struct __pyx_opt_args_11ahocorasick__build_from_string *__pyx_optional_args) {
-  char __pyx_v_sep = ((char)'\n');
-  int __pyx_v_num_patterns;
-  MEMREF *__pyx_v_patterns;
-  ACISM *__pyx_r;
-  __Pyx_RefNannyDeclarations
-  __Pyx_RefNannySetupContext("_build_from_string", 0);
-  if (__pyx_optional_args) {
-    if (__pyx_optional_args->__pyx_n > 0) {
-      __pyx_v_sep = __pyx_optional_args->sep;
-    }
-  }
-
-  /* "ahocorasick.pyx":49
- * 
- * cdef ACISM* _build_from_string(char* string, char sep='\n'):
- *     cdef int num_patterns = 0             # <<<<<<<<<<<<<<
- *     cdef MEMREF* patterns = refsplit(string, sep, &num_patterns)
- *     return _build_from_memrefs(patterns, num_patterns)
- */
-  __pyx_v_num_patterns = 0;
-
-  /* "ahocorasick.pyx":50
- * cdef ACISM* _build_from_string(char* string, char sep='\n'):
- *     cdef int num_patterns = 0
- *     cdef MEMREF* patterns = refsplit(string, sep, &num_patterns)             # <<<<<<<<<<<<<<
- *     return _build_from_memrefs(patterns, num_patterns)
- * 
- */
-  __pyx_v_patterns = refsplit(__pyx_v_string, __pyx_v_sep, (&__pyx_v_num_patterns));
-
-  /* "ahocorasick.pyx":51
- *     cdef int num_patterns = 0
- *     cdef MEMREF* patterns = refsplit(string, sep, &num_patterns)
- *     return _build_from_memrefs(patterns, num_patterns)             # <<<<<<<<<<<<<<
- * 
- * 
- */
-  __pyx_r = __pyx_f_11ahocorasick__build_from_memrefs(__pyx_v_patterns, __pyx_v_num_patterns);
-  goto __pyx_L0;
-
-  /* "ahocorasick.pyx":48
- * 
- * 
- * cdef ACISM* _build_from_string(char* string, char sep='\n'):             # <<<<<<<<<<<<<<
- *     cdef int num_patterns = 0
- *     cdef MEMREF* patterns = refsplit(string, sep, &num_patterns)
- */
-
-  /* function exit code */
-  __pyx_L0:;
-  __Pyx_RefNannyFinishContext();
-  return __pyx_r;
-}
-
-/* "ahocorasick.pyx":54
- * 
- * 
  * cdef FILE* _open_file(const char* path, const char* mode="r"):             # <<<<<<<<<<<<<<
  *     cdef FILE *pfp = fopen(path, mode)
  *     if not pfp:
@@ -905,7 +858,7 @@ static FILE *__pyx_f_11ahocorasick__open_file(char const *__pyx_v_path, struct _
     }
   }
 
-  /* "ahocorasick.pyx":55
+  /* "ahocorasick.pyx":49
  * 
  * cdef FILE* _open_file(const char* path, const char* mode="r"):
  *     cdef FILE *pfp = fopen(path, mode)             # <<<<<<<<<<<<<<
@@ -914,7 +867,7 @@ static FILE *__pyx_f_11ahocorasick__open_file(char const *__pyx_v_path, struct _
  */
   __pyx_v_pfp = fopen(__pyx_v_path, __pyx_v_mode);
 
-  /* "ahocorasick.pyx":56
+  /* "ahocorasick.pyx":50
  * cdef FILE* _open_file(const char* path, const char* mode="r"):
  *     cdef FILE *pfp = fopen(path, mode)
  *     if not pfp:             # <<<<<<<<<<<<<<
@@ -924,31 +877,31 @@ static FILE *__pyx_f_11ahocorasick__open_file(char const *__pyx_v_path, struct _
   __pyx_t_1 = ((!(__pyx_v_pfp != 0)) != 0);
   if (__pyx_t_1) {
 
-    /* "ahocorasick.pyx":57
+    /* "ahocorasick.pyx":51
  *     cdef FILE *pfp = fopen(path, mode)
  *     if not pfp:
  *         raise IOError("Unable to open file: %s" % path)             # <<<<<<<<<<<<<<
  *     return pfp
  * 
  */
-    __pyx_t_2 = __Pyx_PyBytes_FromString(__pyx_v_path); if (unlikely(!__pyx_t_2)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 57; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+    __pyx_t_2 = __Pyx_PyBytes_FromString(__pyx_v_path); if (unlikely(!__pyx_t_2)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 51; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
     __Pyx_GOTREF(__pyx_t_2);
-    __pyx_t_3 = __Pyx_PyString_Format(__pyx_kp_s_Unable_to_open_file_s, __pyx_t_2); if (unlikely(!__pyx_t_3)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 57; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+    __pyx_t_3 = __Pyx_PyString_Format(__pyx_kp_s_Unable_to_open_file_s, __pyx_t_2); if (unlikely(!__pyx_t_3)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 51; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
     __Pyx_GOTREF(__pyx_t_3);
     __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
-    __pyx_t_2 = PyTuple_New(1); if (unlikely(!__pyx_t_2)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 57; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+    __pyx_t_2 = PyTuple_New(1); if (unlikely(!__pyx_t_2)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 51; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
     __Pyx_GOTREF(__pyx_t_2);
     __Pyx_GIVEREF(__pyx_t_3);
     PyTuple_SET_ITEM(__pyx_t_2, 0, __pyx_t_3);
     __pyx_t_3 = 0;
-    __pyx_t_3 = __Pyx_PyObject_Call(__pyx_builtin_IOError, __pyx_t_2, NULL); if (unlikely(!__pyx_t_3)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 57; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+    __pyx_t_3 = __Pyx_PyObject_Call(__pyx_builtin_IOError, __pyx_t_2, NULL); if (unlikely(!__pyx_t_3)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 51; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
     __Pyx_GOTREF(__pyx_t_3);
     __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
     __Pyx_Raise(__pyx_t_3, 0, 0, 0);
     __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
-    {__pyx_filename = __pyx_f[0]; __pyx_lineno = 57; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+    {__pyx_filename = __pyx_f[0]; __pyx_lineno = 51; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
 
-    /* "ahocorasick.pyx":56
+    /* "ahocorasick.pyx":50
  * cdef FILE* _open_file(const char* path, const char* mode="r"):
  *     cdef FILE *pfp = fopen(path, mode)
  *     if not pfp:             # <<<<<<<<<<<<<<
@@ -957,7 +910,7 @@ static FILE *__pyx_f_11ahocorasick__open_file(char const *__pyx_v_path, struct _
  */
   }
 
-  /* "ahocorasick.pyx":58
+  /* "ahocorasick.pyx":52
  *     if not pfp:
  *         raise IOError("Unable to open file: %s" % path)
  *     return pfp             # <<<<<<<<<<<<<<
@@ -967,7 +920,7 @@ static FILE *__pyx_f_11ahocorasick__open_file(char const *__pyx_v_path, struct _
   __pyx_r = __pyx_v_pfp;
   goto __pyx_L0;
 
-  /* "ahocorasick.pyx":54
+  /* "ahocorasick.pyx":48
  * 
  * 
  * cdef FILE* _open_file(const char* path, const char* mode="r"):             # <<<<<<<<<<<<<<
@@ -987,33 +940,77 @@ static FILE *__pyx_f_11ahocorasick__open_file(char const *__pyx_v_path, struct _
 }
 
 /* "ahocorasick.pyx":65
- * #
  * 
- * cdef int on_match(int strnum, int textpos, void* context):             # <<<<<<<<<<<<<<
- *     print "Match"
- *     return 0
+ * 
+ * cdef int on_match(int strnum, int textpos, CONTEXT* context):             # <<<<<<<<<<<<<<
+ *     if context.count >= context.size:
+ *         context.size = context.size * 2
  */
 
-static int __pyx_f_11ahocorasick_on_match(CYTHON_UNUSED int __pyx_v_strnum, CYTHON_UNUSED int __pyx_v_textpos, CYTHON_UNUSED void *__pyx_v_context) {
+static int __pyx_f_11ahocorasick_on_match(int __pyx_v_strnum, CYTHON_UNUSED int __pyx_v_textpos, __pyx_t_11ahocorasick_CONTEXT *__pyx_v_context) {
   int __pyx_r;
   __Pyx_RefNannyDeclarations
-  int __pyx_lineno = 0;
-  const char *__pyx_filename = NULL;
-  int __pyx_clineno = 0;
+  int __pyx_t_1;
   __Pyx_RefNannySetupContext("on_match", 0);
 
   /* "ahocorasick.pyx":66
  * 
- * cdef int on_match(int strnum, int textpos, void* context):
- *     print "Match"             # <<<<<<<<<<<<<<
+ * cdef int on_match(int strnum, int textpos, CONTEXT* context):
+ *     if context.count >= context.size:             # <<<<<<<<<<<<<<
+ *         context.size = context.size * 2
+ *         context.ptr = <int*>realloc(context.ptr, context.size * sizeof (int))
+ */
+  __pyx_t_1 = ((__pyx_v_context->count >= __pyx_v_context->size) != 0);
+  if (__pyx_t_1) {
+
+    /* "ahocorasick.pyx":67
+ * cdef int on_match(int strnum, int textpos, CONTEXT* context):
+ *     if context.count >= context.size:
+ *         context.size = context.size * 2             # <<<<<<<<<<<<<<
+ *         context.ptr = <int*>realloc(context.ptr, context.size * sizeof (int))
+ *     context.ptr[context.count] = strnum
+ */
+    __pyx_v_context->size = (__pyx_v_context->size * 2);
+
+    /* "ahocorasick.pyx":68
+ *     if context.count >= context.size:
+ *         context.size = context.size * 2
+ *         context.ptr = <int*>realloc(context.ptr, context.size * sizeof (int))             # <<<<<<<<<<<<<<
+ *     context.ptr[context.count] = strnum
+ *     context.count += 1
+ */
+    __pyx_v_context->ptr = ((int *)realloc(__pyx_v_context->ptr, (__pyx_v_context->size * (sizeof(int)))));
+
+    /* "ahocorasick.pyx":66
+ * 
+ * cdef int on_match(int strnum, int textpos, CONTEXT* context):
+ *     if context.count >= context.size:             # <<<<<<<<<<<<<<
+ *         context.size = context.size * 2
+ *         context.ptr = <int*>realloc(context.ptr, context.size * sizeof (int))
+ */
+  }
+
+  /* "ahocorasick.pyx":69
+ *         context.size = context.size * 2
+ *         context.ptr = <int*>realloc(context.ptr, context.size * sizeof (int))
+ *     context.ptr[context.count] = strnum             # <<<<<<<<<<<<<<
+ *     context.count += 1
+ *     return 0
+ */
+  (__pyx_v_context->ptr[__pyx_v_context->count]) = __pyx_v_strnum;
+
+  /* "ahocorasick.pyx":70
+ *         context.ptr = <int*>realloc(context.ptr, context.size * sizeof (int))
+ *     context.ptr[context.count] = strnum
+ *     context.count += 1             # <<<<<<<<<<<<<<
  *     return 0
  * 
  */
-  if (__Pyx_PrintOne(0, __pyx_n_s_Match) < 0) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 66; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  __pyx_v_context->count = (__pyx_v_context->count + 1);
 
-  /* "ahocorasick.pyx":67
- * cdef int on_match(int strnum, int textpos, void* context):
- *     print "Match"
+  /* "ahocorasick.pyx":71
+ *     context.ptr[context.count] = strnum
+ *     context.count += 1
  *     return 0             # <<<<<<<<<<<<<<
  * 
  * 
@@ -1022,24 +1019,89 @@ static int __pyx_f_11ahocorasick_on_match(CYTHON_UNUSED int __pyx_v_strnum, CYTH
   goto __pyx_L0;
 
   /* "ahocorasick.pyx":65
- * #
  * 
- * cdef int on_match(int strnum, int textpos, void* context):             # <<<<<<<<<<<<<<
- *     print "Match"
- *     return 0
+ * 
+ * cdef int on_match(int strnum, int textpos, CONTEXT* context):             # <<<<<<<<<<<<<<
+ *     if context.count >= context.size:
+ *         context.size = context.size * 2
  */
 
   /* function exit code */
-  __pyx_L1_error:;
-  __Pyx_WriteUnraisable("ahocorasick.on_match", __pyx_clineno, __pyx_lineno, __pyx_filename, 0, 0);
-  __pyx_r = 0;
   __pyx_L0:;
   __Pyx_RefNannyFinishContext();
   return __pyx_r;
 }
 
-/* "ahocorasick.pyx":74
- *     cdef ACISM* psp
+/* "ahocorasick.pyx":79
+ *     cdef list dictionary
+ * 
+ *     def __init__(self):             # <<<<<<<<<<<<<<
+ *         self.dictionary = []
+ * 
+ */
+
+/* Python wrapper */
+static int __pyx_pw_11ahocorasick_11AhoCorasick_1__init__(PyObject *__pyx_v_self, PyObject *__pyx_args, PyObject *__pyx_kwds); /*proto*/
+static int __pyx_pw_11ahocorasick_11AhoCorasick_1__init__(PyObject *__pyx_v_self, PyObject *__pyx_args, PyObject *__pyx_kwds) {
+  int __pyx_r;
+  __Pyx_RefNannyDeclarations
+  __Pyx_RefNannySetupContext("__init__ (wrapper)", 0);
+  if (unlikely(PyTuple_GET_SIZE(__pyx_args) > 0)) {
+    __Pyx_RaiseArgtupleInvalid("__init__", 1, 0, 0, PyTuple_GET_SIZE(__pyx_args)); return -1;}
+  if (unlikely(__pyx_kwds) && unlikely(PyDict_Size(__pyx_kwds) > 0) && unlikely(!__Pyx_CheckKeywordStrings(__pyx_kwds, "__init__", 0))) return -1;
+  __pyx_r = __pyx_pf_11ahocorasick_11AhoCorasick___init__(((struct __pyx_obj_11ahocorasick_AhoCorasick *)__pyx_v_self));
+
+  /* function exit code */
+  __Pyx_RefNannyFinishContext();
+  return __pyx_r;
+}
+
+static int __pyx_pf_11ahocorasick_11AhoCorasick___init__(struct __pyx_obj_11ahocorasick_AhoCorasick *__pyx_v_self) {
+  int __pyx_r;
+  __Pyx_RefNannyDeclarations
+  PyObject *__pyx_t_1 = NULL;
+  int __pyx_lineno = 0;
+  const char *__pyx_filename = NULL;
+  int __pyx_clineno = 0;
+  __Pyx_RefNannySetupContext("__init__", 0);
+
+  /* "ahocorasick.pyx":80
+ * 
+ *     def __init__(self):
+ *         self.dictionary = []             # <<<<<<<<<<<<<<
+ * 
+ *     def __dealloc__(self):
+ */
+  __pyx_t_1 = PyList_New(0); if (unlikely(!__pyx_t_1)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 80; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  __Pyx_GOTREF(__pyx_t_1);
+  __Pyx_GIVEREF(__pyx_t_1);
+  __Pyx_GOTREF(__pyx_v_self->dictionary);
+  __Pyx_DECREF(__pyx_v_self->dictionary);
+  __pyx_v_self->dictionary = ((PyObject*)__pyx_t_1);
+  __pyx_t_1 = 0;
+
+  /* "ahocorasick.pyx":79
+ *     cdef list dictionary
+ * 
+ *     def __init__(self):             # <<<<<<<<<<<<<<
+ *         self.dictionary = []
+ * 
+ */
+
+  /* function exit code */
+  __pyx_r = 0;
+  goto __pyx_L0;
+  __pyx_L1_error:;
+  __Pyx_XDECREF(__pyx_t_1);
+  __Pyx_AddTraceback("ahocorasick.AhoCorasick.__init__", __pyx_clineno, __pyx_lineno, __pyx_filename);
+  __pyx_r = -1;
+  __pyx_L0:;
+  __Pyx_RefNannyFinishContext();
+  return __pyx_r;
+}
+
+/* "ahocorasick.pyx":82
+ *         self.dictionary = []
  * 
  *     def __dealloc__(self):             # <<<<<<<<<<<<<<
  *         acism_destroy(self.psp)
@@ -1047,21 +1109,21 @@ static int __pyx_f_11ahocorasick_on_match(CYTHON_UNUSED int __pyx_v_strnum, CYTH
  */
 
 /* Python wrapper */
-static void __pyx_pw_11ahocorasick_11AhoCorasick_1__dealloc__(PyObject *__pyx_v_self); /*proto*/
-static void __pyx_pw_11ahocorasick_11AhoCorasick_1__dealloc__(PyObject *__pyx_v_self) {
+static void __pyx_pw_11ahocorasick_11AhoCorasick_3__dealloc__(PyObject *__pyx_v_self); /*proto*/
+static void __pyx_pw_11ahocorasick_11AhoCorasick_3__dealloc__(PyObject *__pyx_v_self) {
   __Pyx_RefNannyDeclarations
   __Pyx_RefNannySetupContext("__dealloc__ (wrapper)", 0);
-  __pyx_pf_11ahocorasick_11AhoCorasick___dealloc__(((struct __pyx_obj_11ahocorasick_AhoCorasick *)__pyx_v_self));
+  __pyx_pf_11ahocorasick_11AhoCorasick_2__dealloc__(((struct __pyx_obj_11ahocorasick_AhoCorasick *)__pyx_v_self));
 
   /* function exit code */
   __Pyx_RefNannyFinishContext();
 }
 
-static void __pyx_pf_11ahocorasick_11AhoCorasick___dealloc__(struct __pyx_obj_11ahocorasick_AhoCorasick *__pyx_v_self) {
+static void __pyx_pf_11ahocorasick_11AhoCorasick_2__dealloc__(struct __pyx_obj_11ahocorasick_AhoCorasick *__pyx_v_self) {
   __Pyx_RefNannyDeclarations
   __Pyx_RefNannySetupContext("__dealloc__", 0);
 
-  /* "ahocorasick.pyx":75
+  /* "ahocorasick.pyx":83
  * 
  *     def __dealloc__(self):
  *         acism_destroy(self.psp)             # <<<<<<<<<<<<<<
@@ -1070,8 +1132,8 @@ static void __pyx_pf_11ahocorasick_11AhoCorasick___dealloc__(struct __pyx_obj_11
  */
   acism_destroy(__pyx_v_self->psp);
 
-  /* "ahocorasick.pyx":74
- *     cdef ACISM* psp
+  /* "ahocorasick.pyx":82
+ *         self.dictionary = []
  * 
  *     def __dealloc__(self):             # <<<<<<<<<<<<<<
  *         acism_destroy(self.psp)
@@ -1082,101 +1144,193 @@ static void __pyx_pf_11ahocorasick_11AhoCorasick___dealloc__(struct __pyx_obj_11
   __Pyx_RefNannyFinishContext();
 }
 
-/* "ahocorasick.pyx":77
+/* "ahocorasick.pyx":85
  *         acism_destroy(self.psp)
  * 
  *     def process(self, text):             # <<<<<<<<<<<<<<
  *         cdef MEMREF ctext = memref(text, len(text))
- *         acism_scan(self.psp, ctext, <ACISM_ACTION*>&on_match, NULL)
+ * 
  */
 
 /* Python wrapper */
-static PyObject *__pyx_pw_11ahocorasick_11AhoCorasick_3process(PyObject *__pyx_v_self, PyObject *__pyx_v_text); /*proto*/
-static PyObject *__pyx_pw_11ahocorasick_11AhoCorasick_3process(PyObject *__pyx_v_self, PyObject *__pyx_v_text) {
+static PyObject *__pyx_pw_11ahocorasick_11AhoCorasick_5process(PyObject *__pyx_v_self, PyObject *__pyx_v_text); /*proto*/
+static PyObject *__pyx_pw_11ahocorasick_11AhoCorasick_5process(PyObject *__pyx_v_self, PyObject *__pyx_v_text) {
   PyObject *__pyx_r = 0;
   __Pyx_RefNannyDeclarations
   __Pyx_RefNannySetupContext("process (wrapper)", 0);
-  __pyx_r = __pyx_pf_11ahocorasick_11AhoCorasick_2process(((struct __pyx_obj_11ahocorasick_AhoCorasick *)__pyx_v_self), ((PyObject *)__pyx_v_text));
+  __pyx_r = __pyx_pf_11ahocorasick_11AhoCorasick_4process(((struct __pyx_obj_11ahocorasick_AhoCorasick *)__pyx_v_self), ((PyObject *)__pyx_v_text));
 
   /* function exit code */
   __Pyx_RefNannyFinishContext();
   return __pyx_r;
 }
 
-static PyObject *__pyx_pf_11ahocorasick_11AhoCorasick_2process(struct __pyx_obj_11ahocorasick_AhoCorasick *__pyx_v_self, PyObject *__pyx_v_text) {
+static PyObject *__pyx_pf_11ahocorasick_11AhoCorasick_4process(struct __pyx_obj_11ahocorasick_AhoCorasick *__pyx_v_self, PyObject *__pyx_v_text) {
   MEMREF __pyx_v_ctext;
+  __pyx_t_11ahocorasick_CONTEXT __pyx_v_context;
+  PyObject *__pyx_v_extracted_terms = NULL;
+  size_t __pyx_v_i;
   PyObject *__pyx_r = NULL;
   __Pyx_RefNannyDeclarations
   char const *__pyx_t_1;
   Py_ssize_t __pyx_t_2;
+  PyObject *__pyx_t_3 = NULL;
+  size_t __pyx_t_4;
+  size_t __pyx_t_5;
+  PyObject *__pyx_t_6 = NULL;
   int __pyx_lineno = 0;
   const char *__pyx_filename = NULL;
   int __pyx_clineno = 0;
   __Pyx_RefNannySetupContext("process", 0);
 
-  /* "ahocorasick.pyx":78
+  /* "ahocorasick.pyx":86
  * 
  *     def process(self, text):
  *         cdef MEMREF ctext = memref(text, len(text))             # <<<<<<<<<<<<<<
- *         acism_scan(self.psp, ctext, <ACISM_ACTION*>&on_match, NULL)
  * 
+ *         # Init structure to store extracted words
  */
-  __pyx_t_1 = __Pyx_PyObject_AsString(__pyx_v_text); if (unlikely((!__pyx_t_1) && PyErr_Occurred())) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 78; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
-  __pyx_t_2 = PyObject_Length(__pyx_v_text); if (unlikely(__pyx_t_2 == -1)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 78; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  __pyx_t_1 = __Pyx_PyObject_AsString(__pyx_v_text); if (unlikely((!__pyx_t_1) && PyErr_Occurred())) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 86; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  __pyx_t_2 = PyObject_Length(__pyx_v_text); if (unlikely(__pyx_t_2 == -1)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 86; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __pyx_v_ctext = memref(__pyx_t_1, __pyx_t_2);
 
-  /* "ahocorasick.pyx":79
- *     def process(self, text):
- *         cdef MEMREF ctext = memref(text, len(text))
- *         acism_scan(self.psp, ctext, <ACISM_ACTION*>&on_match, NULL)             # <<<<<<<<<<<<<<
+  /* "ahocorasick.pyx":90
+ *         # Init structure to store extracted words
+ *         cdef CONTEXT context
+ *         context.ptr = <int*>malloc(50 * sizeof (int))             # <<<<<<<<<<<<<<
+ *         context.size = 50
+ *         context.count = 0
+ */
+  __pyx_v_context.ptr = ((int *)malloc((50 * (sizeof(int)))));
+
+  /* "ahocorasick.pyx":91
+ *         cdef CONTEXT context
+ *         context.ptr = <int*>malloc(50 * sizeof (int))
+ *         context.size = 50             # <<<<<<<<<<<<<<
+ *         context.count = 0
+ * 
+ */
+  __pyx_v_context.size = 50;
+
+  /* "ahocorasick.pyx":92
+ *         context.ptr = <int*>malloc(50 * sizeof (int))
+ *         context.size = 50
+ *         context.count = 0             # <<<<<<<<<<<<<<
+ * 
+ *         # Extract words
+ */
+  __pyx_v_context.count = 0;
+
+  /* "ahocorasick.pyx":95
+ * 
+ *         # Extract words
+ *         acism_scan(self.psp, ctext, <ACISM_ACTION*>&on_match, &context)             # <<<<<<<<<<<<<<
+ * 
+ *         # Build list of extracted terms
+ */
+  acism_scan(__pyx_v_self->psp, __pyx_v_ctext, ((ACISM_ACTION *)(&__pyx_f_11ahocorasick_on_match)), (&__pyx_v_context));
+
+  /* "ahocorasick.pyx":98
+ * 
+ *         # Build list of extracted terms
+ *         extracted_terms = [             # <<<<<<<<<<<<<<
+ *             context.ptr[i]
+ *             for i in range(context.count)
+ */
+  __pyx_t_3 = PyList_New(0); if (unlikely(!__pyx_t_3)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 98; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  __Pyx_GOTREF(__pyx_t_3);
+
+  /* "ahocorasick.pyx":100
+ *         extracted_terms = [
+ *             context.ptr[i]
+ *             for i in range(context.count)             # <<<<<<<<<<<<<<
+ *         ]
+ *         free(context.ptr)
+ */
+  __pyx_t_4 = __pyx_v_context.count;
+  for (__pyx_t_5 = 0; __pyx_t_5 < __pyx_t_4; __pyx_t_5+=1) {
+    __pyx_v_i = __pyx_t_5;
+
+    /* "ahocorasick.pyx":99
+ *         # Build list of extracted terms
+ *         extracted_terms = [
+ *             context.ptr[i]             # <<<<<<<<<<<<<<
+ *             for i in range(context.count)
+ *         ]
+ */
+    __pyx_t_6 = __Pyx_PyInt_From_int((__pyx_v_context.ptr[__pyx_v_i])); if (unlikely(!__pyx_t_6)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 99; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+    __Pyx_GOTREF(__pyx_t_6);
+    if (unlikely(__Pyx_ListComp_Append(__pyx_t_3, (PyObject*)__pyx_t_6))) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 98; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+    __Pyx_DECREF(__pyx_t_6); __pyx_t_6 = 0;
+  }
+  __pyx_v_extracted_terms = ((PyObject*)__pyx_t_3);
+  __pyx_t_3 = 0;
+
+  /* "ahocorasick.pyx":102
+ *             for i in range(context.count)
+ *         ]
+ *         free(context.ptr)             # <<<<<<<<<<<<<<
+ * 
+ *         return extracted_terms
+ */
+  free(__pyx_v_context.ptr);
+
+  /* "ahocorasick.pyx":104
+ *         free(context.ptr)
+ * 
+ *         return extracted_terms             # <<<<<<<<<<<<<<
  * 
  *     def build_from_iterable(self, strings):
  */
-  acism_scan(__pyx_v_self->psp, __pyx_v_ctext, ((ACISM_ACTION *)(&__pyx_f_11ahocorasick_on_match)), NULL);
+  __Pyx_XDECREF(__pyx_r);
+  __Pyx_INCREF(__pyx_v_extracted_terms);
+  __pyx_r = __pyx_v_extracted_terms;
+  goto __pyx_L0;
 
-  /* "ahocorasick.pyx":77
+  /* "ahocorasick.pyx":85
  *         acism_destroy(self.psp)
  * 
  *     def process(self, text):             # <<<<<<<<<<<<<<
  *         cdef MEMREF ctext = memref(text, len(text))
- *         acism_scan(self.psp, ctext, <ACISM_ACTION*>&on_match, NULL)
+ * 
  */
 
   /* function exit code */
-  __pyx_r = Py_None; __Pyx_INCREF(Py_None);
-  goto __pyx_L0;
   __pyx_L1_error:;
+  __Pyx_XDECREF(__pyx_t_3);
+  __Pyx_XDECREF(__pyx_t_6);
   __Pyx_AddTraceback("ahocorasick.AhoCorasick.process", __pyx_clineno, __pyx_lineno, __pyx_filename);
   __pyx_r = NULL;
   __pyx_L0:;
+  __Pyx_XDECREF(__pyx_v_extracted_terms);
   __Pyx_XGIVEREF(__pyx_r);
   __Pyx_RefNannyFinishContext();
   return __pyx_r;
 }
 
-/* "ahocorasick.pyx":81
- *         acism_scan(self.psp, ctext, <ACISM_ACTION*>&on_match, NULL)
+/* "ahocorasick.pyx":106
+ *         return extracted_terms
  * 
  *     def build_from_iterable(self, strings):             # <<<<<<<<<<<<<<
  *         """Build AhoCorasick from an iterable of strings. """
- *         cdef MEMREF* memrefs = <MEMREF *>malloc(len(strings) * sizeof(MEMREF))
+ *         cdef MEMREF* memrefs = <MEMREF *>malloc(len(strings) * sizeof (MEMREF))
  */
 
 /* Python wrapper */
-static PyObject *__pyx_pw_11ahocorasick_11AhoCorasick_5build_from_iterable(PyObject *__pyx_v_self, PyObject *__pyx_v_strings); /*proto*/
-static char __pyx_doc_11ahocorasick_11AhoCorasick_4build_from_iterable[] = "Build AhoCorasick from an iterable of strings. ";
-static PyObject *__pyx_pw_11ahocorasick_11AhoCorasick_5build_from_iterable(PyObject *__pyx_v_self, PyObject *__pyx_v_strings) {
+static PyObject *__pyx_pw_11ahocorasick_11AhoCorasick_7build_from_iterable(PyObject *__pyx_v_self, PyObject *__pyx_v_strings); /*proto*/
+static char __pyx_doc_11ahocorasick_11AhoCorasick_6build_from_iterable[] = "Build AhoCorasick from an iterable of strings. ";
+static PyObject *__pyx_pw_11ahocorasick_11AhoCorasick_7build_from_iterable(PyObject *__pyx_v_self, PyObject *__pyx_v_strings) {
   PyObject *__pyx_r = 0;
   __Pyx_RefNannyDeclarations
   __Pyx_RefNannySetupContext("build_from_iterable (wrapper)", 0);
-  __pyx_r = __pyx_pf_11ahocorasick_11AhoCorasick_4build_from_iterable(((struct __pyx_obj_11ahocorasick_AhoCorasick *)__pyx_v_self), ((PyObject *)__pyx_v_strings));
+  __pyx_r = __pyx_pf_11ahocorasick_11AhoCorasick_6build_from_iterable(((struct __pyx_obj_11ahocorasick_AhoCorasick *)__pyx_v_self), ((PyObject *)__pyx_v_strings));
 
   /* function exit code */
   __Pyx_RefNannyFinishContext();
   return __pyx_r;
 }
 
-static PyObject *__pyx_pf_11ahocorasick_11AhoCorasick_4build_from_iterable(struct __pyx_obj_11ahocorasick_AhoCorasick *__pyx_v_self, PyObject *__pyx_v_strings) {
+static PyObject *__pyx_pf_11ahocorasick_11AhoCorasick_6build_from_iterable(struct __pyx_obj_11ahocorasick_AhoCorasick *__pyx_v_self, PyObject *__pyx_v_strings) {
   MEMREF *__pyx_v_memrefs;
   PyObject *__pyx_v_i = NULL;
   PyObject *__pyx_v_string = NULL;
@@ -1195,19 +1349,35 @@ static PyObject *__pyx_pf_11ahocorasick_11AhoCorasick_4build_from_iterable(struc
   int __pyx_clineno = 0;
   __Pyx_RefNannySetupContext("build_from_iterable", 0);
 
-  /* "ahocorasick.pyx":83
+  /* "ahocorasick.pyx":108
  *     def build_from_iterable(self, strings):
  *         """Build AhoCorasick from an iterable of strings. """
- *         cdef MEMREF* memrefs = <MEMREF *>malloc(len(strings) * sizeof(MEMREF))             # <<<<<<<<<<<<<<
+ *         cdef MEMREF* memrefs = <MEMREF *>malloc(len(strings) * sizeof (MEMREF))             # <<<<<<<<<<<<<<
+ *         self.dictionary = strings
+ *         for i, string in enumerate(strings):
+ */
+  __pyx_t_1 = PyObject_Length(__pyx_v_strings); if (unlikely(__pyx_t_1 == -1)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 108; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  __pyx_v_memrefs = ((MEMREF *)malloc((__pyx_t_1 * (sizeof(MEMREF)))));
+
+  /* "ahocorasick.pyx":109
+ *         """Build AhoCorasick from an iterable of strings. """
+ *         cdef MEMREF* memrefs = <MEMREF *>malloc(len(strings) * sizeof (MEMREF))
+ *         self.dictionary = strings             # <<<<<<<<<<<<<<
  *         for i, string in enumerate(strings):
  *             memrefs[i].ptr = PyString_AsString(string)
  */
-  __pyx_t_1 = PyObject_Length(__pyx_v_strings); if (unlikely(__pyx_t_1 == -1)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 83; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
-  __pyx_v_memrefs = ((MEMREF *)malloc((__pyx_t_1 * (sizeof(MEMREF)))));
+  if (!(likely(PyList_CheckExact(__pyx_v_strings))||((__pyx_v_strings) == Py_None)||(PyErr_Format(PyExc_TypeError, "Expected %.16s, got %.200s", "list", Py_TYPE(__pyx_v_strings)->tp_name), 0))) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 109; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  __pyx_t_2 = __pyx_v_strings;
+  __Pyx_INCREF(__pyx_t_2);
+  __Pyx_GIVEREF(__pyx_t_2);
+  __Pyx_GOTREF(__pyx_v_self->dictionary);
+  __Pyx_DECREF(__pyx_v_self->dictionary);
+  __pyx_v_self->dictionary = ((PyObject*)__pyx_t_2);
+  __pyx_t_2 = 0;
 
-  /* "ahocorasick.pyx":84
- *         """Build AhoCorasick from an iterable of strings. """
- *         cdef MEMREF* memrefs = <MEMREF *>malloc(len(strings) * sizeof(MEMREF))
+  /* "ahocorasick.pyx":110
+ *         cdef MEMREF* memrefs = <MEMREF *>malloc(len(strings) * sizeof (MEMREF))
+ *         self.dictionary = strings
  *         for i, string in enumerate(strings):             # <<<<<<<<<<<<<<
  *             memrefs[i].ptr = PyString_AsString(string)
  *             memrefs[i].len = len(string)
@@ -1218,26 +1388,26 @@ static PyObject *__pyx_pf_11ahocorasick_11AhoCorasick_4build_from_iterable(struc
     __pyx_t_3 = __pyx_v_strings; __Pyx_INCREF(__pyx_t_3); __pyx_t_1 = 0;
     __pyx_t_4 = NULL;
   } else {
-    __pyx_t_1 = -1; __pyx_t_3 = PyObject_GetIter(__pyx_v_strings); if (unlikely(!__pyx_t_3)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 84; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+    __pyx_t_1 = -1; __pyx_t_3 = PyObject_GetIter(__pyx_v_strings); if (unlikely(!__pyx_t_3)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 110; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
     __Pyx_GOTREF(__pyx_t_3);
-    __pyx_t_4 = Py_TYPE(__pyx_t_3)->tp_iternext; if (unlikely(!__pyx_t_4)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 84; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+    __pyx_t_4 = Py_TYPE(__pyx_t_3)->tp_iternext; if (unlikely(!__pyx_t_4)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 110; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   }
   for (;;) {
     if (likely(!__pyx_t_4)) {
       if (likely(PyList_CheckExact(__pyx_t_3))) {
         if (__pyx_t_1 >= PyList_GET_SIZE(__pyx_t_3)) break;
         #if CYTHON_COMPILING_IN_CPYTHON
-        __pyx_t_5 = PyList_GET_ITEM(__pyx_t_3, __pyx_t_1); __Pyx_INCREF(__pyx_t_5); __pyx_t_1++; if (unlikely(0 < 0)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 84; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+        __pyx_t_5 = PyList_GET_ITEM(__pyx_t_3, __pyx_t_1); __Pyx_INCREF(__pyx_t_5); __pyx_t_1++; if (unlikely(0 < 0)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 110; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
         #else
-        __pyx_t_5 = PySequence_ITEM(__pyx_t_3, __pyx_t_1); __pyx_t_1++; if (unlikely(!__pyx_t_5)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 84; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+        __pyx_t_5 = PySequence_ITEM(__pyx_t_3, __pyx_t_1); __pyx_t_1++; if (unlikely(!__pyx_t_5)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 110; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
         __Pyx_GOTREF(__pyx_t_5);
         #endif
       } else {
         if (__pyx_t_1 >= PyTuple_GET_SIZE(__pyx_t_3)) break;
         #if CYTHON_COMPILING_IN_CPYTHON
-        __pyx_t_5 = PyTuple_GET_ITEM(__pyx_t_3, __pyx_t_1); __Pyx_INCREF(__pyx_t_5); __pyx_t_1++; if (unlikely(0 < 0)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 84; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+        __pyx_t_5 = PyTuple_GET_ITEM(__pyx_t_3, __pyx_t_1); __Pyx_INCREF(__pyx_t_5); __pyx_t_1++; if (unlikely(0 < 0)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 110; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
         #else
-        __pyx_t_5 = PySequence_ITEM(__pyx_t_3, __pyx_t_1); __pyx_t_1++; if (unlikely(!__pyx_t_5)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 84; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+        __pyx_t_5 = PySequence_ITEM(__pyx_t_3, __pyx_t_1); __pyx_t_1++; if (unlikely(!__pyx_t_5)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 110; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
         __Pyx_GOTREF(__pyx_t_5);
         #endif
       }
@@ -1247,7 +1417,7 @@ static PyObject *__pyx_pf_11ahocorasick_11AhoCorasick_4build_from_iterable(struc
         PyObject* exc_type = PyErr_Occurred();
         if (exc_type) {
           if (likely(exc_type == PyExc_StopIteration || PyErr_GivenExceptionMatches(exc_type, PyExc_StopIteration))) PyErr_Clear();
-          else {__pyx_filename = __pyx_f[0]; __pyx_lineno = 84; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+          else {__pyx_filename = __pyx_f[0]; __pyx_lineno = 110; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
         }
         break;
       }
@@ -1257,37 +1427,37 @@ static PyObject *__pyx_pf_11ahocorasick_11AhoCorasick_4build_from_iterable(struc
     __pyx_t_5 = 0;
     __Pyx_INCREF(__pyx_t_2);
     __Pyx_XDECREF_SET(__pyx_v_i, __pyx_t_2);
-    __pyx_t_5 = __Pyx_PyInt_AddObjC(__pyx_t_2, __pyx_int_1, 1, 0); if (unlikely(!__pyx_t_5)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 84; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+    __pyx_t_5 = __Pyx_PyInt_AddObjC(__pyx_t_2, __pyx_int_1, 1, 0); if (unlikely(!__pyx_t_5)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 110; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
     __Pyx_GOTREF(__pyx_t_5);
     __Pyx_DECREF(__pyx_t_2);
     __pyx_t_2 = __pyx_t_5;
     __pyx_t_5 = 0;
 
-    /* "ahocorasick.pyx":85
- *         cdef MEMREF* memrefs = <MEMREF *>malloc(len(strings) * sizeof(MEMREF))
+    /* "ahocorasick.pyx":111
+ *         self.dictionary = strings
  *         for i, string in enumerate(strings):
  *             memrefs[i].ptr = PyString_AsString(string)             # <<<<<<<<<<<<<<
  *             memrefs[i].len = len(string)
  *         self.psp = _build_from_memrefs(memrefs, len(strings))
  */
-    __pyx_t_6 = PyString_AsString(__pyx_v_string); if (unlikely(__pyx_t_6 == NULL)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 85; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
-    __pyx_t_7 = __Pyx_PyIndex_AsSsize_t(__pyx_v_i); if (unlikely((__pyx_t_7 == (Py_ssize_t)-1) && PyErr_Occurred())) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 85; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+    __pyx_t_6 = PyString_AsString(__pyx_v_string); if (unlikely(__pyx_t_6 == NULL)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 111; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+    __pyx_t_7 = __Pyx_PyIndex_AsSsize_t(__pyx_v_i); if (unlikely((__pyx_t_7 == (Py_ssize_t)-1) && PyErr_Occurred())) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 111; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
     (__pyx_v_memrefs[__pyx_t_7]).ptr = __pyx_t_6;
 
-    /* "ahocorasick.pyx":86
+    /* "ahocorasick.pyx":112
  *         for i, string in enumerate(strings):
  *             memrefs[i].ptr = PyString_AsString(string)
  *             memrefs[i].len = len(string)             # <<<<<<<<<<<<<<
  *         self.psp = _build_from_memrefs(memrefs, len(strings))
  *         free(memrefs)
  */
-    __pyx_t_7 = PyObject_Length(__pyx_v_string); if (unlikely(__pyx_t_7 == -1)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 86; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
-    __pyx_t_8 = __Pyx_PyIndex_AsSsize_t(__pyx_v_i); if (unlikely((__pyx_t_8 == (Py_ssize_t)-1) && PyErr_Occurred())) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 86; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+    __pyx_t_7 = PyObject_Length(__pyx_v_string); if (unlikely(__pyx_t_7 == -1)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 112; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+    __pyx_t_8 = __Pyx_PyIndex_AsSsize_t(__pyx_v_i); if (unlikely((__pyx_t_8 == (Py_ssize_t)-1) && PyErr_Occurred())) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 112; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
     (__pyx_v_memrefs[__pyx_t_8]).len = __pyx_t_7;
 
-    /* "ahocorasick.pyx":84
- *         """Build AhoCorasick from an iterable of strings. """
- *         cdef MEMREF* memrefs = <MEMREF *>malloc(len(strings) * sizeof(MEMREF))
+    /* "ahocorasick.pyx":110
+ *         cdef MEMREF* memrefs = <MEMREF *>malloc(len(strings) * sizeof (MEMREF))
+ *         self.dictionary = strings
  *         for i, string in enumerate(strings):             # <<<<<<<<<<<<<<
  *             memrefs[i].ptr = PyString_AsString(string)
  *             memrefs[i].len = len(string)
@@ -1296,31 +1466,31 @@ static PyObject *__pyx_pf_11ahocorasick_11AhoCorasick_4build_from_iterable(struc
   __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
   __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
 
-  /* "ahocorasick.pyx":87
+  /* "ahocorasick.pyx":113
  *             memrefs[i].ptr = PyString_AsString(string)
  *             memrefs[i].len = len(string)
  *         self.psp = _build_from_memrefs(memrefs, len(strings))             # <<<<<<<<<<<<<<
  *         free(memrefs)
  * 
  */
-  __pyx_t_1 = PyObject_Length(__pyx_v_strings); if (unlikely(__pyx_t_1 == -1)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 87; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  __pyx_t_1 = PyObject_Length(__pyx_v_strings); if (unlikely(__pyx_t_1 == -1)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 113; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __pyx_v_self->psp = __pyx_f_11ahocorasick__build_from_memrefs(__pyx_v_memrefs, __pyx_t_1);
 
-  /* "ahocorasick.pyx":88
+  /* "ahocorasick.pyx":114
  *             memrefs[i].len = len(string)
  *         self.psp = _build_from_memrefs(memrefs, len(strings))
  *         free(memrefs)             # <<<<<<<<<<<<<<
  * 
- *     def build_from_string(self, string, char sep='\n'):
+ *     def build_from_string(self, string, sep='\n'):
  */
   free(__pyx_v_memrefs);
 
-  /* "ahocorasick.pyx":81
- *         acism_scan(self.psp, ctext, <ACISM_ACTION*>&on_match, NULL)
+  /* "ahocorasick.pyx":106
+ *         return extracted_terms
  * 
  *     def build_from_iterable(self, strings):             # <<<<<<<<<<<<<<
  *         """Build AhoCorasick from an iterable of strings. """
- *         cdef MEMREF* memrefs = <MEMREF *>malloc(len(strings) * sizeof(MEMREF))
+ *         cdef MEMREF* memrefs = <MEMREF *>malloc(len(strings) * sizeof (MEMREF))
  */
 
   /* function exit code */
@@ -1340,20 +1510,20 @@ static PyObject *__pyx_pf_11ahocorasick_11AhoCorasick_4build_from_iterable(struc
   return __pyx_r;
 }
 
-/* "ahocorasick.pyx":90
+/* "ahocorasick.pyx":116
  *         free(memrefs)
  * 
- *     def build_from_string(self, string, char sep='\n'):             # <<<<<<<<<<<<<<
+ *     def build_from_string(self, string, sep='\n'):             # <<<<<<<<<<<<<<
  *         """Build string detector from `sep`-separated
  *         terms found in `string`. """
  */
 
 /* Python wrapper */
-static PyObject *__pyx_pw_11ahocorasick_11AhoCorasick_7build_from_string(PyObject *__pyx_v_self, PyObject *__pyx_args, PyObject *__pyx_kwds); /*proto*/
-static char __pyx_doc_11ahocorasick_11AhoCorasick_6build_from_string[] = "Build string detector from `sep`-separated\n        terms found in `string`. ";
-static PyObject *__pyx_pw_11ahocorasick_11AhoCorasick_7build_from_string(PyObject *__pyx_v_self, PyObject *__pyx_args, PyObject *__pyx_kwds) {
+static PyObject *__pyx_pw_11ahocorasick_11AhoCorasick_9build_from_string(PyObject *__pyx_v_self, PyObject *__pyx_args, PyObject *__pyx_kwds); /*proto*/
+static char __pyx_doc_11ahocorasick_11AhoCorasick_8build_from_string[] = "Build string detector from `sep`-separated\n        terms found in `string`. ";
+static PyObject *__pyx_pw_11ahocorasick_11AhoCorasick_9build_from_string(PyObject *__pyx_v_self, PyObject *__pyx_args, PyObject *__pyx_kwds) {
   PyObject *__pyx_v_string = 0;
-  char __pyx_v_sep;
+  PyObject *__pyx_v_sep = 0;
   int __pyx_lineno = 0;
   const char *__pyx_filename = NULL;
   int __pyx_clineno = 0;
@@ -1363,6 +1533,7 @@ static PyObject *__pyx_pw_11ahocorasick_11AhoCorasick_7build_from_string(PyObjec
   {
     static PyObject **__pyx_pyargnames[] = {&__pyx_n_s_string,&__pyx_n_s_sep,0};
     PyObject* values[2] = {0,0};
+    values[1] = ((PyObject *)__pyx_kp_s_);
     if (unlikely(__pyx_kwds)) {
       Py_ssize_t kw_args;
       const Py_ssize_t pos_args = PyTuple_GET_SIZE(__pyx_args);
@@ -1384,7 +1555,7 @@ static PyObject *__pyx_pw_11ahocorasick_11AhoCorasick_7build_from_string(PyObjec
         }
       }
       if (unlikely(kw_args > 0)) {
-        if (unlikely(__Pyx_ParseOptionalKeywords(__pyx_kwds, __pyx_pyargnames, 0, values, pos_args, "build_from_string") < 0)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 90; __pyx_clineno = __LINE__; goto __pyx_L3_error;}
+        if (unlikely(__Pyx_ParseOptionalKeywords(__pyx_kwds, __pyx_pyargnames, 0, values, pos_args, "build_from_string") < 0)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 116; __pyx_clineno = __LINE__; goto __pyx_L3_error;}
       }
     } else {
       switch (PyTuple_GET_SIZE(__pyx_args)) {
@@ -1395,70 +1566,113 @@ static PyObject *__pyx_pw_11ahocorasick_11AhoCorasick_7build_from_string(PyObjec
       }
     }
     __pyx_v_string = values[0];
-    if (values[1]) {
-      __pyx_v_sep = __Pyx_PyInt_As_char(values[1]); if (unlikely((__pyx_v_sep == (char)-1) && PyErr_Occurred())) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 90; __pyx_clineno = __LINE__; goto __pyx_L3_error;}
-    } else {
-      __pyx_v_sep = ((char)'\n');
-    }
+    __pyx_v_sep = values[1];
   }
   goto __pyx_L4_argument_unpacking_done;
   __pyx_L5_argtuple_error:;
-  __Pyx_RaiseArgtupleInvalid("build_from_string", 0, 1, 2, PyTuple_GET_SIZE(__pyx_args)); {__pyx_filename = __pyx_f[0]; __pyx_lineno = 90; __pyx_clineno = __LINE__; goto __pyx_L3_error;}
+  __Pyx_RaiseArgtupleInvalid("build_from_string", 0, 1, 2, PyTuple_GET_SIZE(__pyx_args)); {__pyx_filename = __pyx_f[0]; __pyx_lineno = 116; __pyx_clineno = __LINE__; goto __pyx_L3_error;}
   __pyx_L3_error:;
   __Pyx_AddTraceback("ahocorasick.AhoCorasick.build_from_string", __pyx_clineno, __pyx_lineno, __pyx_filename);
   __Pyx_RefNannyFinishContext();
   return NULL;
   __pyx_L4_argument_unpacking_done:;
-  __pyx_r = __pyx_pf_11ahocorasick_11AhoCorasick_6build_from_string(((struct __pyx_obj_11ahocorasick_AhoCorasick *)__pyx_v_self), __pyx_v_string, __pyx_v_sep);
+  __pyx_r = __pyx_pf_11ahocorasick_11AhoCorasick_8build_from_string(((struct __pyx_obj_11ahocorasick_AhoCorasick *)__pyx_v_self), __pyx_v_string, __pyx_v_sep);
 
   /* function exit code */
   __Pyx_RefNannyFinishContext();
   return __pyx_r;
 }
 
-static PyObject *__pyx_pf_11ahocorasick_11AhoCorasick_6build_from_string(struct __pyx_obj_11ahocorasick_AhoCorasick *__pyx_v_self, PyObject *__pyx_v_string, char __pyx_v_sep) {
-  char *__pyx_v_cstring;
-  CYTHON_UNUSED char __pyx_v_csep;
+static PyObject *__pyx_pf_11ahocorasick_11AhoCorasick_8build_from_string(struct __pyx_obj_11ahocorasick_AhoCorasick *__pyx_v_self, PyObject *__pyx_v_string, PyObject *__pyx_v_sep) {
+  PyObject *__pyx_v_strings = NULL;
   PyObject *__pyx_r = NULL;
   __Pyx_RefNannyDeclarations
-  char *__pyx_t_1;
+  PyObject *__pyx_t_1 = NULL;
+  PyObject *__pyx_t_2 = NULL;
+  PyObject *__pyx_t_3 = NULL;
+  PyObject *__pyx_t_4 = NULL;
   int __pyx_lineno = 0;
   const char *__pyx_filename = NULL;
   int __pyx_clineno = 0;
   __Pyx_RefNannySetupContext("build_from_string", 0);
 
-  /* "ahocorasick.pyx":93
+  /* "ahocorasick.pyx":119
  *         """Build string detector from `sep`-separated
  *         terms found in `string`. """
- *         cdef char* cstring = string             # <<<<<<<<<<<<<<
- *         cdef char  csep = sep
- *         self.psp = _build_from_string(cstring)
- */
-  __pyx_t_1 = __Pyx_PyObject_AsString(__pyx_v_string); if (unlikely((!__pyx_t_1) && PyErr_Occurred())) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 93; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
-  __pyx_v_cstring = __pyx_t_1;
-
-  /* "ahocorasick.pyx":94
- *         terms found in `string`. """
- *         cdef char* cstring = string
- *         cdef char  csep = sep             # <<<<<<<<<<<<<<
- *         self.psp = _build_from_string(cstring)
+ *         strings = string.split(sep)             # <<<<<<<<<<<<<<
+ *         self.build_from_iterable(strings)
  * 
  */
-  __pyx_v_csep = __pyx_v_sep;
+  __pyx_t_2 = __Pyx_PyObject_GetAttrStr(__pyx_v_string, __pyx_n_s_split); if (unlikely(!__pyx_t_2)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 119; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  __Pyx_GOTREF(__pyx_t_2);
+  __pyx_t_3 = NULL;
+  if (CYTHON_COMPILING_IN_CPYTHON && likely(PyMethod_Check(__pyx_t_2))) {
+    __pyx_t_3 = PyMethod_GET_SELF(__pyx_t_2);
+    if (likely(__pyx_t_3)) {
+      PyObject* function = PyMethod_GET_FUNCTION(__pyx_t_2);
+      __Pyx_INCREF(__pyx_t_3);
+      __Pyx_INCREF(function);
+      __Pyx_DECREF_SET(__pyx_t_2, function);
+    }
+  }
+  if (!__pyx_t_3) {
+    __pyx_t_1 = __Pyx_PyObject_CallOneArg(__pyx_t_2, __pyx_v_sep); if (unlikely(!__pyx_t_1)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 119; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+    __Pyx_GOTREF(__pyx_t_1);
+  } else {
+    __pyx_t_4 = PyTuple_New(1+1); if (unlikely(!__pyx_t_4)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 119; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+    __Pyx_GOTREF(__pyx_t_4);
+    __Pyx_GIVEREF(__pyx_t_3); PyTuple_SET_ITEM(__pyx_t_4, 0, __pyx_t_3); __pyx_t_3 = NULL;
+    __Pyx_INCREF(__pyx_v_sep);
+    __Pyx_GIVEREF(__pyx_v_sep);
+    PyTuple_SET_ITEM(__pyx_t_4, 0+1, __pyx_v_sep);
+    __pyx_t_1 = __Pyx_PyObject_Call(__pyx_t_2, __pyx_t_4, NULL); if (unlikely(!__pyx_t_1)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 119; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+    __Pyx_GOTREF(__pyx_t_1);
+    __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
+  }
+  __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
+  __pyx_v_strings = __pyx_t_1;
+  __pyx_t_1 = 0;
 
-  /* "ahocorasick.pyx":95
- *         cdef char* cstring = string
- *         cdef char  csep = sep
- *         self.psp = _build_from_string(cstring)             # <<<<<<<<<<<<<<
+  /* "ahocorasick.pyx":120
+ *         terms found in `string`. """
+ *         strings = string.split(sep)
+ *         self.build_from_iterable(strings)             # <<<<<<<<<<<<<<
  * 
  *     def build_from_file(self, path):
  */
-  __pyx_v_self->psp = __pyx_f_11ahocorasick__build_from_string(__pyx_v_cstring, NULL);
+  __pyx_t_2 = __Pyx_PyObject_GetAttrStr(((PyObject *)__pyx_v_self), __pyx_n_s_build_from_iterable); if (unlikely(!__pyx_t_2)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 120; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  __Pyx_GOTREF(__pyx_t_2);
+  __pyx_t_4 = NULL;
+  if (CYTHON_COMPILING_IN_CPYTHON && likely(PyMethod_Check(__pyx_t_2))) {
+    __pyx_t_4 = PyMethod_GET_SELF(__pyx_t_2);
+    if (likely(__pyx_t_4)) {
+      PyObject* function = PyMethod_GET_FUNCTION(__pyx_t_2);
+      __Pyx_INCREF(__pyx_t_4);
+      __Pyx_INCREF(function);
+      __Pyx_DECREF_SET(__pyx_t_2, function);
+    }
+  }
+  if (!__pyx_t_4) {
+    __pyx_t_1 = __Pyx_PyObject_CallOneArg(__pyx_t_2, __pyx_v_strings); if (unlikely(!__pyx_t_1)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 120; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+    __Pyx_GOTREF(__pyx_t_1);
+  } else {
+    __pyx_t_3 = PyTuple_New(1+1); if (unlikely(!__pyx_t_3)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 120; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+    __Pyx_GOTREF(__pyx_t_3);
+    __Pyx_GIVEREF(__pyx_t_4); PyTuple_SET_ITEM(__pyx_t_3, 0, __pyx_t_4); __pyx_t_4 = NULL;
+    __Pyx_INCREF(__pyx_v_strings);
+    __Pyx_GIVEREF(__pyx_v_strings);
+    PyTuple_SET_ITEM(__pyx_t_3, 0+1, __pyx_v_strings);
+    __pyx_t_1 = __Pyx_PyObject_Call(__pyx_t_2, __pyx_t_3, NULL); if (unlikely(!__pyx_t_1)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 120; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+    __Pyx_GOTREF(__pyx_t_1);
+    __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
+  }
+  __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
+  __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
 
-  /* "ahocorasick.pyx":90
+  /* "ahocorasick.pyx":116
  *         free(memrefs)
  * 
- *     def build_from_string(self, string, char sep='\n'):             # <<<<<<<<<<<<<<
+ *     def build_from_string(self, string, sep='\n'):             # <<<<<<<<<<<<<<
  *         """Build string detector from `sep`-separated
  *         terms found in `string`. """
  */
@@ -1467,16 +1681,21 @@ static PyObject *__pyx_pf_11ahocorasick_11AhoCorasick_6build_from_string(struct 
   __pyx_r = Py_None; __Pyx_INCREF(Py_None);
   goto __pyx_L0;
   __pyx_L1_error:;
+  __Pyx_XDECREF(__pyx_t_1);
+  __Pyx_XDECREF(__pyx_t_2);
+  __Pyx_XDECREF(__pyx_t_3);
+  __Pyx_XDECREF(__pyx_t_4);
   __Pyx_AddTraceback("ahocorasick.AhoCorasick.build_from_string", __pyx_clineno, __pyx_lineno, __pyx_filename);
   __pyx_r = NULL;
   __pyx_L0:;
+  __Pyx_XDECREF(__pyx_v_strings);
   __Pyx_XGIVEREF(__pyx_r);
   __Pyx_RefNannyFinishContext();
   return __pyx_r;
 }
 
-/* "ahocorasick.pyx":97
- *         self.psp = _build_from_string(cstring)
+/* "ahocorasick.pyx":122
+ *         self.build_from_iterable(strings)
  * 
  *     def build_from_file(self, path):             # <<<<<<<<<<<<<<
  *         """Read a """
@@ -1484,20 +1703,20 @@ static PyObject *__pyx_pf_11ahocorasick_11AhoCorasick_6build_from_string(struct 
  */
 
 /* Python wrapper */
-static PyObject *__pyx_pw_11ahocorasick_11AhoCorasick_9build_from_file(PyObject *__pyx_v_self, PyObject *__pyx_v_path); /*proto*/
-static char __pyx_doc_11ahocorasick_11AhoCorasick_8build_from_file[] = "Read a ";
-static PyObject *__pyx_pw_11ahocorasick_11AhoCorasick_9build_from_file(PyObject *__pyx_v_self, PyObject *__pyx_v_path) {
+static PyObject *__pyx_pw_11ahocorasick_11AhoCorasick_11build_from_file(PyObject *__pyx_v_self, PyObject *__pyx_v_path); /*proto*/
+static char __pyx_doc_11ahocorasick_11AhoCorasick_10build_from_file[] = "Read a ";
+static PyObject *__pyx_pw_11ahocorasick_11AhoCorasick_11build_from_file(PyObject *__pyx_v_self, PyObject *__pyx_v_path) {
   PyObject *__pyx_r = 0;
   __Pyx_RefNannyDeclarations
   __Pyx_RefNannySetupContext("build_from_file (wrapper)", 0);
-  __pyx_r = __pyx_pf_11ahocorasick_11AhoCorasick_8build_from_file(((struct __pyx_obj_11ahocorasick_AhoCorasick *)__pyx_v_self), ((PyObject *)__pyx_v_path));
+  __pyx_r = __pyx_pf_11ahocorasick_11AhoCorasick_10build_from_file(((struct __pyx_obj_11ahocorasick_AhoCorasick *)__pyx_v_self), ((PyObject *)__pyx_v_path));
 
   /* function exit code */
   __Pyx_RefNannyFinishContext();
   return __pyx_r;
 }
 
-static PyObject *__pyx_pf_11ahocorasick_11AhoCorasick_8build_from_file(struct __pyx_obj_11ahocorasick_AhoCorasick *__pyx_v_self, PyObject *__pyx_v_path) {
+static PyObject *__pyx_pf_11ahocorasick_11AhoCorasick_10build_from_file(struct __pyx_obj_11ahocorasick_AhoCorasick *__pyx_v_self, PyObject *__pyx_v_path) {
   PyObject *__pyx_v_input_dictionary = NULL;
   PyObject *__pyx_r = NULL;
   __Pyx_RefNannyDeclarations
@@ -1518,7 +1737,7 @@ static PyObject *__pyx_pf_11ahocorasick_11AhoCorasick_8build_from_file(struct __
   int __pyx_clineno = 0;
   __Pyx_RefNannySetupContext("build_from_file", 0);
 
-  /* "ahocorasick.pyx":99
+  /* "ahocorasick.pyx":124
  *     def build_from_file(self, path):
  *         """Read a """
  *         with open(path, "rb") as input_dictionary:             # <<<<<<<<<<<<<<
@@ -1526,7 +1745,7 @@ static PyObject *__pyx_pf_11ahocorasick_11AhoCorasick_8build_from_file(struct __
  * 
  */
   /*with:*/ {
-    __pyx_t_1 = PyTuple_New(2); if (unlikely(!__pyx_t_1)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 99; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+    __pyx_t_1 = PyTuple_New(2); if (unlikely(!__pyx_t_1)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 124; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
     __Pyx_GOTREF(__pyx_t_1);
     __Pyx_INCREF(__pyx_v_path);
     __Pyx_GIVEREF(__pyx_v_path);
@@ -1534,12 +1753,12 @@ static PyObject *__pyx_pf_11ahocorasick_11AhoCorasick_8build_from_file(struct __
     __Pyx_INCREF(__pyx_n_s_rb);
     __Pyx_GIVEREF(__pyx_n_s_rb);
     PyTuple_SET_ITEM(__pyx_t_1, 1, __pyx_n_s_rb);
-    __pyx_t_2 = __Pyx_PyObject_Call(__pyx_builtin_open, __pyx_t_1, NULL); if (unlikely(!__pyx_t_2)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 99; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+    __pyx_t_2 = __Pyx_PyObject_Call(__pyx_builtin_open, __pyx_t_1, NULL); if (unlikely(!__pyx_t_2)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 124; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
     __Pyx_GOTREF(__pyx_t_2);
     __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
-    __pyx_t_3 = __Pyx_PyObject_LookupSpecial(__pyx_t_2, __pyx_n_s_exit); if (unlikely(!__pyx_t_3)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 99; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+    __pyx_t_3 = __Pyx_PyObject_LookupSpecial(__pyx_t_2, __pyx_n_s_exit); if (unlikely(!__pyx_t_3)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 124; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
     __Pyx_GOTREF(__pyx_t_3);
-    __pyx_t_4 = __Pyx_PyObject_LookupSpecial(__pyx_t_2, __pyx_n_s_enter); if (unlikely(!__pyx_t_4)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 99; __pyx_clineno = __LINE__; goto __pyx_L3_error;}
+    __pyx_t_4 = __Pyx_PyObject_LookupSpecial(__pyx_t_2, __pyx_n_s_enter); if (unlikely(!__pyx_t_4)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 124; __pyx_clineno = __LINE__; goto __pyx_L3_error;}
     __Pyx_GOTREF(__pyx_t_4);
     __pyx_t_5 = NULL;
     if (CYTHON_COMPILING_IN_CPYTHON && likely(PyMethod_Check(__pyx_t_4))) {
@@ -1552,10 +1771,10 @@ static PyObject *__pyx_pf_11ahocorasick_11AhoCorasick_8build_from_file(struct __
       }
     }
     if (__pyx_t_5) {
-      __pyx_t_1 = __Pyx_PyObject_CallOneArg(__pyx_t_4, __pyx_t_5); if (unlikely(!__pyx_t_1)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 99; __pyx_clineno = __LINE__; goto __pyx_L3_error;}
+      __pyx_t_1 = __Pyx_PyObject_CallOneArg(__pyx_t_4, __pyx_t_5); if (unlikely(!__pyx_t_1)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 124; __pyx_clineno = __LINE__; goto __pyx_L3_error;}
       __Pyx_DECREF(__pyx_t_5); __pyx_t_5 = 0;
     } else {
-      __pyx_t_1 = __Pyx_PyObject_CallNoArg(__pyx_t_4); if (unlikely(!__pyx_t_1)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 99; __pyx_clineno = __LINE__; goto __pyx_L3_error;}
+      __pyx_t_1 = __Pyx_PyObject_CallNoArg(__pyx_t_4); if (unlikely(!__pyx_t_1)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 124; __pyx_clineno = __LINE__; goto __pyx_L3_error;}
     }
     __Pyx_GOTREF(__pyx_t_1);
     __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
@@ -1572,16 +1791,16 @@ static PyObject *__pyx_pf_11ahocorasick_11AhoCorasick_8build_from_file(struct __
           __pyx_v_input_dictionary = __pyx_t_4;
           __pyx_t_4 = 0;
 
-          /* "ahocorasick.pyx":100
+          /* "ahocorasick.pyx":125
  *         """Read a """
  *         with open(path, "rb") as input_dictionary:
  *             self.build_from_string(input_dictionary.read())             # <<<<<<<<<<<<<<
  * 
  *     def dump(self, path):
  */
-          __pyx_t_2 = __Pyx_PyObject_GetAttrStr(((PyObject *)__pyx_v_self), __pyx_n_s_build_from_string); if (unlikely(!__pyx_t_2)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 100; __pyx_clineno = __LINE__; goto __pyx_L7_error;}
+          __pyx_t_2 = __Pyx_PyObject_GetAttrStr(((PyObject *)__pyx_v_self), __pyx_n_s_build_from_string); if (unlikely(!__pyx_t_2)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 125; __pyx_clineno = __LINE__; goto __pyx_L7_error;}
           __Pyx_GOTREF(__pyx_t_2);
-          __pyx_t_5 = __Pyx_PyObject_GetAttrStr(__pyx_v_input_dictionary, __pyx_n_s_read); if (unlikely(!__pyx_t_5)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 100; __pyx_clineno = __LINE__; goto __pyx_L7_error;}
+          __pyx_t_5 = __Pyx_PyObject_GetAttrStr(__pyx_v_input_dictionary, __pyx_n_s_read); if (unlikely(!__pyx_t_5)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 125; __pyx_clineno = __LINE__; goto __pyx_L7_error;}
           __Pyx_GOTREF(__pyx_t_5);
           __pyx_t_9 = NULL;
           if (CYTHON_COMPILING_IN_CPYTHON && likely(PyMethod_Check(__pyx_t_5))) {
@@ -1594,10 +1813,10 @@ static PyObject *__pyx_pf_11ahocorasick_11AhoCorasick_8build_from_file(struct __
             }
           }
           if (__pyx_t_9) {
-            __pyx_t_1 = __Pyx_PyObject_CallOneArg(__pyx_t_5, __pyx_t_9); if (unlikely(!__pyx_t_1)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 100; __pyx_clineno = __LINE__; goto __pyx_L7_error;}
+            __pyx_t_1 = __Pyx_PyObject_CallOneArg(__pyx_t_5, __pyx_t_9); if (unlikely(!__pyx_t_1)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 125; __pyx_clineno = __LINE__; goto __pyx_L7_error;}
             __Pyx_DECREF(__pyx_t_9); __pyx_t_9 = 0;
           } else {
-            __pyx_t_1 = __Pyx_PyObject_CallNoArg(__pyx_t_5); if (unlikely(!__pyx_t_1)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 100; __pyx_clineno = __LINE__; goto __pyx_L7_error;}
+            __pyx_t_1 = __Pyx_PyObject_CallNoArg(__pyx_t_5); if (unlikely(!__pyx_t_1)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 125; __pyx_clineno = __LINE__; goto __pyx_L7_error;}
           }
           __Pyx_GOTREF(__pyx_t_1);
           __Pyx_DECREF(__pyx_t_5); __pyx_t_5 = 0;
@@ -1612,24 +1831,24 @@ static PyObject *__pyx_pf_11ahocorasick_11AhoCorasick_8build_from_file(struct __
             }
           }
           if (!__pyx_t_5) {
-            __pyx_t_4 = __Pyx_PyObject_CallOneArg(__pyx_t_2, __pyx_t_1); if (unlikely(!__pyx_t_4)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 100; __pyx_clineno = __LINE__; goto __pyx_L7_error;}
+            __pyx_t_4 = __Pyx_PyObject_CallOneArg(__pyx_t_2, __pyx_t_1); if (unlikely(!__pyx_t_4)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 125; __pyx_clineno = __LINE__; goto __pyx_L7_error;}
             __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
             __Pyx_GOTREF(__pyx_t_4);
           } else {
-            __pyx_t_9 = PyTuple_New(1+1); if (unlikely(!__pyx_t_9)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 100; __pyx_clineno = __LINE__; goto __pyx_L7_error;}
+            __pyx_t_9 = PyTuple_New(1+1); if (unlikely(!__pyx_t_9)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 125; __pyx_clineno = __LINE__; goto __pyx_L7_error;}
             __Pyx_GOTREF(__pyx_t_9);
             __Pyx_GIVEREF(__pyx_t_5); PyTuple_SET_ITEM(__pyx_t_9, 0, __pyx_t_5); __pyx_t_5 = NULL;
             __Pyx_GIVEREF(__pyx_t_1);
             PyTuple_SET_ITEM(__pyx_t_9, 0+1, __pyx_t_1);
             __pyx_t_1 = 0;
-            __pyx_t_4 = __Pyx_PyObject_Call(__pyx_t_2, __pyx_t_9, NULL); if (unlikely(!__pyx_t_4)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 100; __pyx_clineno = __LINE__; goto __pyx_L7_error;}
+            __pyx_t_4 = __Pyx_PyObject_Call(__pyx_t_2, __pyx_t_9, NULL); if (unlikely(!__pyx_t_4)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 125; __pyx_clineno = __LINE__; goto __pyx_L7_error;}
             __Pyx_GOTREF(__pyx_t_4);
             __Pyx_DECREF(__pyx_t_9); __pyx_t_9 = 0;
           }
           __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
           __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
 
-          /* "ahocorasick.pyx":99
+          /* "ahocorasick.pyx":124
  *     def build_from_file(self, path):
  *         """Read a """
  *         with open(path, "rb") as input_dictionary:             # <<<<<<<<<<<<<<
@@ -1649,20 +1868,20 @@ static PyObject *__pyx_pf_11ahocorasick_11AhoCorasick_8build_from_file(struct __
         __Pyx_XDECREF(__pyx_t_4); __pyx_t_4 = 0;
         /*except:*/ {
           __Pyx_AddTraceback("ahocorasick.AhoCorasick.build_from_file", __pyx_clineno, __pyx_lineno, __pyx_filename);
-          if (__Pyx_GetException(&__pyx_t_4, &__pyx_t_2, &__pyx_t_9) < 0) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 99; __pyx_clineno = __LINE__; goto __pyx_L9_except_error;}
+          if (__Pyx_GetException(&__pyx_t_4, &__pyx_t_2, &__pyx_t_9) < 0) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 124; __pyx_clineno = __LINE__; goto __pyx_L9_except_error;}
           __Pyx_GOTREF(__pyx_t_4);
           __Pyx_GOTREF(__pyx_t_2);
           __Pyx_GOTREF(__pyx_t_9);
-          __pyx_t_1 = PyTuple_Pack(3, __pyx_t_4, __pyx_t_2, __pyx_t_9); if (unlikely(!__pyx_t_1)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 99; __pyx_clineno = __LINE__; goto __pyx_L9_except_error;}
+          __pyx_t_1 = PyTuple_Pack(3, __pyx_t_4, __pyx_t_2, __pyx_t_9); if (unlikely(!__pyx_t_1)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 124; __pyx_clineno = __LINE__; goto __pyx_L9_except_error;}
           __Pyx_GOTREF(__pyx_t_1);
           __pyx_t_10 = __Pyx_PyObject_Call(__pyx_t_3, __pyx_t_1, NULL);
           __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
           __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
-          if (unlikely(!__pyx_t_10)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 99; __pyx_clineno = __LINE__; goto __pyx_L9_except_error;}
+          if (unlikely(!__pyx_t_10)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 124; __pyx_clineno = __LINE__; goto __pyx_L9_except_error;}
           __Pyx_GOTREF(__pyx_t_10);
           __pyx_t_11 = __Pyx_PyObject_IsTrue(__pyx_t_10);
           __Pyx_DECREF(__pyx_t_10); __pyx_t_10 = 0;
-          if (__pyx_t_11 < 0) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 99; __pyx_clineno = __LINE__; goto __pyx_L9_except_error;}
+          if (__pyx_t_11 < 0) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 124; __pyx_clineno = __LINE__; goto __pyx_L9_except_error;}
           __pyx_t_12 = ((!(__pyx_t_11 != 0)) != 0);
           if (__pyx_t_12) {
             __Pyx_GIVEREF(__pyx_t_4);
@@ -1670,7 +1889,7 @@ static PyObject *__pyx_pf_11ahocorasick_11AhoCorasick_8build_from_file(struct __
             __Pyx_XGIVEREF(__pyx_t_9);
             __Pyx_ErrRestore(__pyx_t_4, __pyx_t_2, __pyx_t_9);
             __pyx_t_4 = 0; __pyx_t_2 = 0; __pyx_t_9 = 0; 
-            {__pyx_filename = __pyx_f[0]; __pyx_lineno = 99; __pyx_clineno = __LINE__; goto __pyx_L9_except_error;}
+            {__pyx_filename = __pyx_f[0]; __pyx_lineno = 124; __pyx_clineno = __LINE__; goto __pyx_L9_except_error;}
           }
           __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
           __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
@@ -1694,9 +1913,9 @@ static PyObject *__pyx_pf_11ahocorasick_11AhoCorasick_8build_from_file(struct __
     /*finally:*/ {
       /*normal exit:*/{
         if (__pyx_t_3) {
-          __pyx_t_8 = __Pyx_PyObject_Call(__pyx_t_3, __pyx_tuple_, NULL);
+          __pyx_t_8 = __Pyx_PyObject_Call(__pyx_t_3, __pyx_tuple__2, NULL);
           __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
-          if (unlikely(!__pyx_t_8)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 99; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+          if (unlikely(!__pyx_t_8)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 124; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
           __Pyx_GOTREF(__pyx_t_8);
           __Pyx_DECREF(__pyx_t_8); __pyx_t_8 = 0;
         }
@@ -1711,8 +1930,8 @@ static PyObject *__pyx_pf_11ahocorasick_11AhoCorasick_8build_from_file(struct __
     __pyx_L18:;
   }
 
-  /* "ahocorasick.pyx":97
- *         self.psp = _build_from_string(cstring)
+  /* "ahocorasick.pyx":122
+ *         self.build_from_iterable(strings)
  * 
  *     def build_from_file(self, path):             # <<<<<<<<<<<<<<
  *         """Read a """
@@ -1737,7 +1956,7 @@ static PyObject *__pyx_pf_11ahocorasick_11AhoCorasick_8build_from_file(struct __
   return __pyx_r;
 }
 
-/* "ahocorasick.pyx":102
+/* "ahocorasick.pyx":127
  *             self.build_from_string(input_dictionary.read())
  * 
  *     def dump(self, path):             # <<<<<<<<<<<<<<
@@ -1746,19 +1965,19 @@ static PyObject *__pyx_pf_11ahocorasick_11AhoCorasick_8build_from_file(struct __
  */
 
 /* Python wrapper */
-static PyObject *__pyx_pw_11ahocorasick_11AhoCorasick_11dump(PyObject *__pyx_v_self, PyObject *__pyx_v_path); /*proto*/
-static PyObject *__pyx_pw_11ahocorasick_11AhoCorasick_11dump(PyObject *__pyx_v_self, PyObject *__pyx_v_path) {
+static PyObject *__pyx_pw_11ahocorasick_11AhoCorasick_13dump(PyObject *__pyx_v_self, PyObject *__pyx_v_path); /*proto*/
+static PyObject *__pyx_pw_11ahocorasick_11AhoCorasick_13dump(PyObject *__pyx_v_self, PyObject *__pyx_v_path) {
   PyObject *__pyx_r = 0;
   __Pyx_RefNannyDeclarations
   __Pyx_RefNannySetupContext("dump (wrapper)", 0);
-  __pyx_r = __pyx_pf_11ahocorasick_11AhoCorasick_10dump(((struct __pyx_obj_11ahocorasick_AhoCorasick *)__pyx_v_self), ((PyObject *)__pyx_v_path));
+  __pyx_r = __pyx_pf_11ahocorasick_11AhoCorasick_12dump(((struct __pyx_obj_11ahocorasick_AhoCorasick *)__pyx_v_self), ((PyObject *)__pyx_v_path));
 
   /* function exit code */
   __Pyx_RefNannyFinishContext();
   return __pyx_r;
 }
 
-static PyObject *__pyx_pf_11ahocorasick_11AhoCorasick_10dump(struct __pyx_obj_11ahocorasick_AhoCorasick *__pyx_v_self, PyObject *__pyx_v_path) {
+static PyObject *__pyx_pf_11ahocorasick_11AhoCorasick_12dump(struct __pyx_obj_11ahocorasick_AhoCorasick *__pyx_v_self, PyObject *__pyx_v_path) {
   FILE *__pyx_v_fp;
   PyObject *__pyx_r = NULL;
   __Pyx_RefNannyDeclarations
@@ -1770,20 +1989,20 @@ static PyObject *__pyx_pf_11ahocorasick_11AhoCorasick_10dump(struct __pyx_obj_11
   int __pyx_clineno = 0;
   __Pyx_RefNannySetupContext("dump", 0);
 
-  /* "ahocorasick.pyx":103
+  /* "ahocorasick.pyx":128
  * 
  *     def dump(self, path):
  *         cdef FILE* fp = _open_file(path, "w")             # <<<<<<<<<<<<<<
  *         acism_save(fp, self.psp)
  *         fclose(fp)
  */
-  __pyx_t_1 = __Pyx_PyObject_AsString(__pyx_v_path); if (unlikely((!__pyx_t_1) && PyErr_Occurred())) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 103; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  __pyx_t_1 = __Pyx_PyObject_AsString(__pyx_v_path); if (unlikely((!__pyx_t_1) && PyErr_Occurred())) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 128; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __pyx_t_3.__pyx_n = 1;
   __pyx_t_3.mode = __pyx_k_w;
   __pyx_t_2 = __pyx_f_11ahocorasick__open_file(__pyx_t_1, &__pyx_t_3); 
   __pyx_v_fp = __pyx_t_2;
 
-  /* "ahocorasick.pyx":104
+  /* "ahocorasick.pyx":129
  *     def dump(self, path):
  *         cdef FILE* fp = _open_file(path, "w")
  *         acism_save(fp, self.psp)             # <<<<<<<<<<<<<<
@@ -1792,7 +2011,7 @@ static PyObject *__pyx_pf_11ahocorasick_11AhoCorasick_10dump(struct __pyx_obj_11
  */
   acism_save(__pyx_v_fp, __pyx_v_self->psp);
 
-  /* "ahocorasick.pyx":105
+  /* "ahocorasick.pyx":130
  *         cdef FILE* fp = _open_file(path, "w")
  *         acism_save(fp, self.psp)
  *         fclose(fp)             # <<<<<<<<<<<<<<
@@ -1801,7 +2020,7 @@ static PyObject *__pyx_pf_11ahocorasick_11AhoCorasick_10dump(struct __pyx_obj_11
  */
   fclose(__pyx_v_fp);
 
-  /* "ahocorasick.pyx":102
+  /* "ahocorasick.pyx":127
  *             self.build_from_string(input_dictionary.read())
  * 
  *     def dump(self, path):             # <<<<<<<<<<<<<<
@@ -1821,7 +2040,7 @@ static PyObject *__pyx_pf_11ahocorasick_11AhoCorasick_10dump(struct __pyx_obj_11
   return __pyx_r;
 }
 
-/* "ahocorasick.pyx":107
+/* "ahocorasick.pyx":132
  *         fclose(fp)
  * 
  *     def load(self, path):             # <<<<<<<<<<<<<<
@@ -1830,19 +2049,19 @@ static PyObject *__pyx_pf_11ahocorasick_11AhoCorasick_10dump(struct __pyx_obj_11
  */
 
 /* Python wrapper */
-static PyObject *__pyx_pw_11ahocorasick_11AhoCorasick_13load(PyObject *__pyx_v_self, PyObject *__pyx_v_path); /*proto*/
-static PyObject *__pyx_pw_11ahocorasick_11AhoCorasick_13load(PyObject *__pyx_v_self, PyObject *__pyx_v_path) {
+static PyObject *__pyx_pw_11ahocorasick_11AhoCorasick_15load(PyObject *__pyx_v_self, PyObject *__pyx_v_path); /*proto*/
+static PyObject *__pyx_pw_11ahocorasick_11AhoCorasick_15load(PyObject *__pyx_v_self, PyObject *__pyx_v_path) {
   PyObject *__pyx_r = 0;
   __Pyx_RefNannyDeclarations
   __Pyx_RefNannySetupContext("load (wrapper)", 0);
-  __pyx_r = __pyx_pf_11ahocorasick_11AhoCorasick_12load(((struct __pyx_obj_11ahocorasick_AhoCorasick *)__pyx_v_self), ((PyObject *)__pyx_v_path));
+  __pyx_r = __pyx_pf_11ahocorasick_11AhoCorasick_14load(((struct __pyx_obj_11ahocorasick_AhoCorasick *)__pyx_v_self), ((PyObject *)__pyx_v_path));
 
   /* function exit code */
   __Pyx_RefNannyFinishContext();
   return __pyx_r;
 }
 
-static PyObject *__pyx_pf_11ahocorasick_11AhoCorasick_12load(struct __pyx_obj_11ahocorasick_AhoCorasick *__pyx_v_self, PyObject *__pyx_v_path) {
+static PyObject *__pyx_pf_11ahocorasick_11AhoCorasick_14load(struct __pyx_obj_11ahocorasick_AhoCorasick *__pyx_v_self, PyObject *__pyx_v_path) {
   FILE *__pyx_v_patterns_file;
   PyObject *__pyx_r = NULL;
   __Pyx_RefNannyDeclarations
@@ -1852,17 +2071,17 @@ static PyObject *__pyx_pf_11ahocorasick_11AhoCorasick_12load(struct __pyx_obj_11
   int __pyx_clineno = 0;
   __Pyx_RefNannySetupContext("load", 0);
 
-  /* "ahocorasick.pyx":108
+  /* "ahocorasick.pyx":133
  * 
  *     def load(self, path):
  *         cdef FILE* patterns_file = _open_file(path)             # <<<<<<<<<<<<<<
  *         # Load structure into memory
  *         self.psp = acism_load(patterns_file)
  */
-  __pyx_t_1 = __Pyx_PyObject_AsString(__pyx_v_path); if (unlikely((!__pyx_t_1) && PyErr_Occurred())) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 108; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  __pyx_t_1 = __Pyx_PyObject_AsString(__pyx_v_path); if (unlikely((!__pyx_t_1) && PyErr_Occurred())) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 133; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __pyx_v_patterns_file = __pyx_f_11ahocorasick__open_file(__pyx_t_1, NULL);
 
-  /* "ahocorasick.pyx":110
+  /* "ahocorasick.pyx":135
  *         cdef FILE* patterns_file = _open_file(path)
  *         # Load structure into memory
  *         self.psp = acism_load(patterns_file)             # <<<<<<<<<<<<<<
@@ -1871,7 +2090,7 @@ static PyObject *__pyx_pf_11ahocorasick_11AhoCorasick_12load(struct __pyx_obj_11
  */
   __pyx_v_self->psp = acism_load(__pyx_v_patterns_file);
 
-  /* "ahocorasick.pyx":111
+  /* "ahocorasick.pyx":136
  *         # Load structure into memory
  *         self.psp = acism_load(patterns_file)
  *         fclose(patterns_file)             # <<<<<<<<<<<<<<
@@ -1880,7 +2099,7 @@ static PyObject *__pyx_pf_11ahocorasick_11AhoCorasick_12load(struct __pyx_obj_11
  */
   fclose(__pyx_v_patterns_file);
 
-  /* "ahocorasick.pyx":107
+  /* "ahocorasick.pyx":132
  *         fclose(fp)
  * 
  *     def load(self, path):             # <<<<<<<<<<<<<<
@@ -1900,7 +2119,7 @@ static PyObject *__pyx_pf_11ahocorasick_11AhoCorasick_12load(struct __pyx_obj_11
   return __pyx_r;
 }
 
-/* "ahocorasick.pyx":113
+/* "ahocorasick.pyx":138
  *         fclose(patterns_file)
  * 
  *     def mmap(self, path):             # <<<<<<<<<<<<<<
@@ -1909,19 +2128,19 @@ static PyObject *__pyx_pf_11ahocorasick_11AhoCorasick_12load(struct __pyx_obj_11
  */
 
 /* Python wrapper */
-static PyObject *__pyx_pw_11ahocorasick_11AhoCorasick_15mmap(PyObject *__pyx_v_self, PyObject *__pyx_v_path); /*proto*/
-static PyObject *__pyx_pw_11ahocorasick_11AhoCorasick_15mmap(PyObject *__pyx_v_self, PyObject *__pyx_v_path) {
+static PyObject *__pyx_pw_11ahocorasick_11AhoCorasick_17mmap(PyObject *__pyx_v_self, PyObject *__pyx_v_path); /*proto*/
+static PyObject *__pyx_pw_11ahocorasick_11AhoCorasick_17mmap(PyObject *__pyx_v_self, PyObject *__pyx_v_path) {
   PyObject *__pyx_r = 0;
   __Pyx_RefNannyDeclarations
   __Pyx_RefNannySetupContext("mmap (wrapper)", 0);
-  __pyx_r = __pyx_pf_11ahocorasick_11AhoCorasick_14mmap(((struct __pyx_obj_11ahocorasick_AhoCorasick *)__pyx_v_self), ((PyObject *)__pyx_v_path));
+  __pyx_r = __pyx_pf_11ahocorasick_11AhoCorasick_16mmap(((struct __pyx_obj_11ahocorasick_AhoCorasick *)__pyx_v_self), ((PyObject *)__pyx_v_path));
 
   /* function exit code */
   __Pyx_RefNannyFinishContext();
   return __pyx_r;
 }
 
-static PyObject *__pyx_pf_11ahocorasick_11AhoCorasick_14mmap(struct __pyx_obj_11ahocorasick_AhoCorasick *__pyx_v_self, PyObject *__pyx_v_path) {
+static PyObject *__pyx_pf_11ahocorasick_11AhoCorasick_16mmap(struct __pyx_obj_11ahocorasick_AhoCorasick *__pyx_v_self, PyObject *__pyx_v_path) {
   FILE *__pyx_v_patterns_file;
   PyObject *__pyx_r = NULL;
   __Pyx_RefNannyDeclarations
@@ -1931,17 +2150,17 @@ static PyObject *__pyx_pf_11ahocorasick_11AhoCorasick_14mmap(struct __pyx_obj_11
   int __pyx_clineno = 0;
   __Pyx_RefNannySetupContext("mmap", 0);
 
-  /* "ahocorasick.pyx":114
+  /* "ahocorasick.pyx":139
  * 
  *     def mmap(self, path):
  *         cdef FILE* patterns_file = _open_file(path)             # <<<<<<<<<<<<<<
  *         # MMAP structure into memory
  *         self.psp = acism_mmap(patterns_file)
  */
-  __pyx_t_1 = __Pyx_PyObject_AsString(__pyx_v_path); if (unlikely((!__pyx_t_1) && PyErr_Occurred())) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 114; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  __pyx_t_1 = __Pyx_PyObject_AsString(__pyx_v_path); if (unlikely((!__pyx_t_1) && PyErr_Occurred())) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 139; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __pyx_v_patterns_file = __pyx_f_11ahocorasick__open_file(__pyx_t_1, NULL);
 
-  /* "ahocorasick.pyx":116
+  /* "ahocorasick.pyx":141
  *         cdef FILE* patterns_file = _open_file(path)
  *         # MMAP structure into memory
  *         self.psp = acism_mmap(patterns_file)             # <<<<<<<<<<<<<<
@@ -1949,14 +2168,14 @@ static PyObject *__pyx_pf_11ahocorasick_11AhoCorasick_14mmap(struct __pyx_obj_11
  */
   __pyx_v_self->psp = acism_mmap(__pyx_v_patterns_file);
 
-  /* "ahocorasick.pyx":117
+  /* "ahocorasick.pyx":142
  *         # MMAP structure into memory
  *         self.psp = acism_mmap(patterns_file)
  *         fclose(patterns_file)             # <<<<<<<<<<<<<<
  */
   fclose(__pyx_v_patterns_file);
 
-  /* "ahocorasick.pyx":113
+  /* "ahocorasick.pyx":138
  *         fclose(patterns_file)
  * 
  *     def mmap(self, path):             # <<<<<<<<<<<<<<
@@ -1977,6 +2196,7 @@ static PyObject *__pyx_pf_11ahocorasick_11AhoCorasick_14mmap(struct __pyx_obj_11
 }
 
 static PyObject *__pyx_tp_new_11ahocorasick_AhoCorasick(PyTypeObject *t, CYTHON_UNUSED PyObject *a, CYTHON_UNUSED PyObject *k) {
+  struct __pyx_obj_11ahocorasick_AhoCorasick *p;
   PyObject *o;
   if (likely((t->tp_flags & Py_TPFLAGS_IS_ABSTRACT) == 0)) {
     o = (*t->tp_alloc)(t, 0);
@@ -1984,34 +2204,57 @@ static PyObject *__pyx_tp_new_11ahocorasick_AhoCorasick(PyTypeObject *t, CYTHON_
     o = (PyObject *) PyBaseObject_Type.tp_new(t, __pyx_empty_tuple, 0);
   }
   if (unlikely(!o)) return 0;
+  p = ((struct __pyx_obj_11ahocorasick_AhoCorasick *)o);
+  p->dictionary = ((PyObject*)Py_None); Py_INCREF(Py_None);
   return o;
 }
 
 static void __pyx_tp_dealloc_11ahocorasick_AhoCorasick(PyObject *o) {
+  struct __pyx_obj_11ahocorasick_AhoCorasick *p = (struct __pyx_obj_11ahocorasick_AhoCorasick *)o;
   #if PY_VERSION_HEX >= 0x030400a1
-  if (unlikely(Py_TYPE(o)->tp_finalize) && (!PyType_IS_GC(Py_TYPE(o)) || !_PyGC_FINALIZED(o))) {
+  if (unlikely(Py_TYPE(o)->tp_finalize) && !_PyGC_FINALIZED(o)) {
     if (PyObject_CallFinalizerFromDealloc(o)) return;
   }
   #endif
+  PyObject_GC_UnTrack(o);
   {
     PyObject *etype, *eval, *etb;
     PyErr_Fetch(&etype, &eval, &etb);
     ++Py_REFCNT(o);
-    __pyx_pw_11ahocorasick_11AhoCorasick_1__dealloc__(o);
+    __pyx_pw_11ahocorasick_11AhoCorasick_3__dealloc__(o);
     --Py_REFCNT(o);
     PyErr_Restore(etype, eval, etb);
   }
+  Py_CLEAR(p->dictionary);
   (*Py_TYPE(o)->tp_free)(o);
 }
 
+static int __pyx_tp_traverse_11ahocorasick_AhoCorasick(PyObject *o, visitproc v, void *a) {
+  int e;
+  struct __pyx_obj_11ahocorasick_AhoCorasick *p = (struct __pyx_obj_11ahocorasick_AhoCorasick *)o;
+  if (p->dictionary) {
+    e = (*v)(p->dictionary, a); if (e) return e;
+  }
+  return 0;
+}
+
+static int __pyx_tp_clear_11ahocorasick_AhoCorasick(PyObject *o) {
+  PyObject* tmp;
+  struct __pyx_obj_11ahocorasick_AhoCorasick *p = (struct __pyx_obj_11ahocorasick_AhoCorasick *)o;
+  tmp = ((PyObject*)p->dictionary);
+  p->dictionary = ((PyObject*)Py_None); Py_INCREF(Py_None);
+  Py_XDECREF(tmp);
+  return 0;
+}
+
 static PyMethodDef __pyx_methods_11ahocorasick_AhoCorasick[] = {
-  {"process", (PyCFunction)__pyx_pw_11ahocorasick_11AhoCorasick_3process, METH_O, 0},
-  {"build_from_iterable", (PyCFunction)__pyx_pw_11ahocorasick_11AhoCorasick_5build_from_iterable, METH_O, __pyx_doc_11ahocorasick_11AhoCorasick_4build_from_iterable},
-  {"build_from_string", (PyCFunction)__pyx_pw_11ahocorasick_11AhoCorasick_7build_from_string, METH_VARARGS|METH_KEYWORDS, __pyx_doc_11ahocorasick_11AhoCorasick_6build_from_string},
-  {"build_from_file", (PyCFunction)__pyx_pw_11ahocorasick_11AhoCorasick_9build_from_file, METH_O, __pyx_doc_11ahocorasick_11AhoCorasick_8build_from_file},
-  {"dump", (PyCFunction)__pyx_pw_11ahocorasick_11AhoCorasick_11dump, METH_O, 0},
-  {"load", (PyCFunction)__pyx_pw_11ahocorasick_11AhoCorasick_13load, METH_O, 0},
-  {"mmap", (PyCFunction)__pyx_pw_11ahocorasick_11AhoCorasick_15mmap, METH_O, 0},
+  {"process", (PyCFunction)__pyx_pw_11ahocorasick_11AhoCorasick_5process, METH_O, 0},
+  {"build_from_iterable", (PyCFunction)__pyx_pw_11ahocorasick_11AhoCorasick_7build_from_iterable, METH_O, __pyx_doc_11ahocorasick_11AhoCorasick_6build_from_iterable},
+  {"build_from_string", (PyCFunction)__pyx_pw_11ahocorasick_11AhoCorasick_9build_from_string, METH_VARARGS|METH_KEYWORDS, __pyx_doc_11ahocorasick_11AhoCorasick_8build_from_string},
+  {"build_from_file", (PyCFunction)__pyx_pw_11ahocorasick_11AhoCorasick_11build_from_file, METH_O, __pyx_doc_11ahocorasick_11AhoCorasick_10build_from_file},
+  {"dump", (PyCFunction)__pyx_pw_11ahocorasick_11AhoCorasick_13dump, METH_O, 0},
+  {"load", (PyCFunction)__pyx_pw_11ahocorasick_11AhoCorasick_15load, METH_O, 0},
+  {"mmap", (PyCFunction)__pyx_pw_11ahocorasick_11AhoCorasick_17mmap, METH_O, 0},
   {0, 0, 0, 0}
 };
 
@@ -2040,10 +2283,10 @@ static PyTypeObject __pyx_type_11ahocorasick_AhoCorasick = {
   0, /*tp_getattro*/
   0, /*tp_setattro*/
   0, /*tp_as_buffer*/
-  Py_TPFLAGS_DEFAULT|Py_TPFLAGS_HAVE_VERSION_TAG|Py_TPFLAGS_CHECKTYPES|Py_TPFLAGS_HAVE_NEWBUFFER|Py_TPFLAGS_BASETYPE, /*tp_flags*/
+  Py_TPFLAGS_DEFAULT|Py_TPFLAGS_HAVE_VERSION_TAG|Py_TPFLAGS_CHECKTYPES|Py_TPFLAGS_HAVE_NEWBUFFER|Py_TPFLAGS_BASETYPE|Py_TPFLAGS_HAVE_GC, /*tp_flags*/
   0, /*tp_doc*/
-  0, /*tp_traverse*/
-  0, /*tp_clear*/
+  __pyx_tp_traverse_11ahocorasick_AhoCorasick, /*tp_traverse*/
+  __pyx_tp_clear_11ahocorasick_AhoCorasick, /*tp_clear*/
   0, /*tp_richcompare*/
   0, /*tp_weaklistoffset*/
   0, /*tp_iter*/
@@ -2056,7 +2299,7 @@ static PyTypeObject __pyx_type_11ahocorasick_AhoCorasick = {
   0, /*tp_descr_get*/
   0, /*tp_descr_set*/
   0, /*tp_dictoffset*/
-  0, /*tp_init*/
+  __pyx_pw_11ahocorasick_11AhoCorasick_1__init__, /*tp_init*/
   0, /*tp_alloc*/
   __pyx_tp_new_11ahocorasick_AhoCorasick, /*tp_new*/
   0, /*tp_free*/
@@ -2096,29 +2339,30 @@ static struct PyModuleDef __pyx_moduledef = {
 #endif
 
 static __Pyx_StringTabEntry __pyx_string_tab[] = {
+  {&__pyx_kp_s_, __pyx_k_, sizeof(__pyx_k_), 0, 0, 1, 0},
   {&__pyx_n_s_IOError, __pyx_k_IOError, sizeof(__pyx_k_IOError), 0, 0, 1, 1},
-  {&__pyx_n_s_Match, __pyx_k_Match, sizeof(__pyx_k_Match), 0, 0, 1, 1},
   {&__pyx_kp_s_Unable_to_open_file_s, __pyx_k_Unable_to_open_file_s, sizeof(__pyx_k_Unable_to_open_file_s), 0, 0, 1, 0},
+  {&__pyx_n_s_build_from_iterable, __pyx_k_build_from_iterable, sizeof(__pyx_k_build_from_iterable), 0, 0, 1, 1},
   {&__pyx_n_s_build_from_string, __pyx_k_build_from_string, sizeof(__pyx_k_build_from_string), 0, 0, 1, 1},
-  {&__pyx_n_s_end, __pyx_k_end, sizeof(__pyx_k_end), 0, 0, 1, 1},
   {&__pyx_n_s_enter, __pyx_k_enter, sizeof(__pyx_k_enter), 0, 0, 1, 1},
   {&__pyx_n_s_enumerate, __pyx_k_enumerate, sizeof(__pyx_k_enumerate), 0, 0, 1, 1},
   {&__pyx_n_s_exit, __pyx_k_exit, sizeof(__pyx_k_exit), 0, 0, 1, 1},
-  {&__pyx_n_s_file, __pyx_k_file, sizeof(__pyx_k_file), 0, 0, 1, 1},
   {&__pyx_n_s_main, __pyx_k_main, sizeof(__pyx_k_main), 0, 0, 1, 1},
   {&__pyx_n_s_open, __pyx_k_open, sizeof(__pyx_k_open), 0, 0, 1, 1},
-  {&__pyx_n_s_print, __pyx_k_print, sizeof(__pyx_k_print), 0, 0, 1, 1},
+  {&__pyx_n_s_range, __pyx_k_range, sizeof(__pyx_k_range), 0, 0, 1, 1},
   {&__pyx_n_s_rb, __pyx_k_rb, sizeof(__pyx_k_rb), 0, 0, 1, 1},
   {&__pyx_n_s_read, __pyx_k_read, sizeof(__pyx_k_read), 0, 0, 1, 1},
   {&__pyx_n_s_sep, __pyx_k_sep, sizeof(__pyx_k_sep), 0, 0, 1, 1},
+  {&__pyx_n_s_split, __pyx_k_split, sizeof(__pyx_k_split), 0, 0, 1, 1},
   {&__pyx_n_s_string, __pyx_k_string, sizeof(__pyx_k_string), 0, 0, 1, 1},
   {&__pyx_n_s_test, __pyx_k_test, sizeof(__pyx_k_test), 0, 0, 1, 1},
   {0, 0, 0, 0, 0, 0, 0}
 };
 static int __Pyx_InitCachedBuiltins(void) {
-  __pyx_builtin_IOError = __Pyx_GetBuiltinName(__pyx_n_s_IOError); if (!__pyx_builtin_IOError) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 57; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
-  __pyx_builtin_enumerate = __Pyx_GetBuiltinName(__pyx_n_s_enumerate); if (!__pyx_builtin_enumerate) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 84; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
-  __pyx_builtin_open = __Pyx_GetBuiltinName(__pyx_n_s_open); if (!__pyx_builtin_open) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 99; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  __pyx_builtin_IOError = __Pyx_GetBuiltinName(__pyx_n_s_IOError); if (!__pyx_builtin_IOError) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 51; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  __pyx_builtin_range = __Pyx_GetBuiltinName(__pyx_n_s_range); if (!__pyx_builtin_range) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 100; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  __pyx_builtin_enumerate = __Pyx_GetBuiltinName(__pyx_n_s_enumerate); if (!__pyx_builtin_enumerate) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 110; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  __pyx_builtin_open = __Pyx_GetBuiltinName(__pyx_n_s_open); if (!__pyx_builtin_open) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 124; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   return 0;
   __pyx_L1_error:;
   return -1;
@@ -2128,16 +2372,16 @@ static int __Pyx_InitCachedConstants(void) {
   __Pyx_RefNannyDeclarations
   __Pyx_RefNannySetupContext("__Pyx_InitCachedConstants", 0);
 
-  /* "ahocorasick.pyx":99
+  /* "ahocorasick.pyx":124
  *     def build_from_file(self, path):
  *         """Read a """
  *         with open(path, "rb") as input_dictionary:             # <<<<<<<<<<<<<<
  *             self.build_from_string(input_dictionary.read())
  * 
  */
-  __pyx_tuple_ = PyTuple_Pack(3, Py_None, Py_None, Py_None); if (unlikely(!__pyx_tuple_)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 99; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
-  __Pyx_GOTREF(__pyx_tuple_);
-  __Pyx_GIVEREF(__pyx_tuple_);
+  __pyx_tuple__2 = PyTuple_Pack(3, Py_None, Py_None, Py_None); if (unlikely(!__pyx_tuple__2)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 124; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  __Pyx_GOTREF(__pyx_tuple__2);
+  __Pyx_GIVEREF(__pyx_tuple__2);
   __Pyx_RefNannyFinishContext();
   return 0;
   __pyx_L1_error:;
@@ -2240,9 +2484,9 @@ PyMODINIT_FUNC PyInit_ahocorasick(void)
   /*--- Variable export code ---*/
   /*--- Function export code ---*/
   /*--- Type init code ---*/
-  if (PyType_Ready(&__pyx_type_11ahocorasick_AhoCorasick) < 0) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 70; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  if (PyType_Ready(&__pyx_type_11ahocorasick_AhoCorasick) < 0) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 74; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __pyx_type_11ahocorasick_AhoCorasick.tp_print = 0;
-  if (PyObject_SetAttrString(__pyx_m, "AhoCorasick", (PyObject *)&__pyx_type_11ahocorasick_AhoCorasick) < 0) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 70; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
+  if (PyObject_SetAttrString(__pyx_m, "AhoCorasick", (PyObject *)&__pyx_type_11ahocorasick_AhoCorasick) < 0) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 74; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __pyx_ptype_11ahocorasick_AhoCorasick = &__pyx_type_11ahocorasick_AhoCorasick;
   /*--- Type import code ---*/
   __pyx_ptype_7cpython_4type_type = __Pyx_ImportType(__Pyx_BUILTIN_MODULE_NAME, "type", 
@@ -2262,7 +2506,7 @@ PyMODINIT_FUNC PyInit_ahocorasick(void)
   /* "ahocorasick.pyx":2
  * 
  * from libc.stdio cimport FILE, fopen, fclose             # <<<<<<<<<<<<<<
- * from libc.stdlib cimport malloc, free
+ * from libc.stdlib cimport malloc, free, realloc
  * from libc.string cimport strlen
  */
   __pyx_t_1 = PyDict_New(); if (unlikely(!__pyx_t_1)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 2; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
@@ -2568,6 +2812,70 @@ static void __Pyx_WriteUnraisable(const char *name, CYTHON_UNUSED int clineno,
 #endif
 }
 
+static void __Pyx_RaiseArgtupleInvalid(
+    const char* func_name,
+    int exact,
+    Py_ssize_t num_min,
+    Py_ssize_t num_max,
+    Py_ssize_t num_found)
+{
+    Py_ssize_t num_expected;
+    const char *more_or_less;
+    if (num_found < num_min) {
+        num_expected = num_min;
+        more_or_less = "at least";
+    } else {
+        num_expected = num_max;
+        more_or_less = "at most";
+    }
+    if (exact) {
+        more_or_less = "exactly";
+    }
+    PyErr_Format(PyExc_TypeError,
+                 "%.200s() takes %.8s %" CYTHON_FORMAT_SSIZE_T "d positional argument%.1s (%" CYTHON_FORMAT_SSIZE_T "d given)",
+                 func_name, more_or_less, num_expected,
+                 (num_expected == 1) ? "" : "s", num_found);
+}
+
+static CYTHON_INLINE int __Pyx_CheckKeywordStrings(
+    PyObject *kwdict,
+    const char* function_name,
+    int kw_allowed)
+{
+    PyObject* key = 0;
+    Py_ssize_t pos = 0;
+#if CYTHON_COMPILING_IN_PYPY
+    if (!kw_allowed && PyDict_Next(kwdict, &pos, &key, 0))
+        goto invalid_keyword;
+    return 1;
+#else
+    while (PyDict_Next(kwdict, &pos, &key, 0)) {
+        #if PY_MAJOR_VERSION < 3
+        if (unlikely(!PyString_CheckExact(key)) && unlikely(!PyString_Check(key)))
+        #endif
+            if (unlikely(!PyUnicode_Check(key)))
+                goto invalid_keyword_type;
+    }
+    if ((!kw_allowed) && unlikely(key))
+        goto invalid_keyword;
+    return 1;
+invalid_keyword_type:
+    PyErr_Format(PyExc_TypeError,
+        "%.200s() keywords must be strings", function_name);
+    return 0;
+#endif
+invalid_keyword:
+    PyErr_Format(PyExc_TypeError,
+    #if PY_MAJOR_VERSION < 3
+        "%.200s() got an unexpected keyword argument '%.200s'",
+        function_name, PyString_AsString(key));
+    #else
+        "%s() got an unexpected keyword argument '%U'",
+        function_name, key);
+    #endif
+    return 0;
+}
+
 #if CYTHON_USE_PYLONG_INTERNALS
   #include "longintrepr.h"
 #endif
@@ -2781,31 +3089,6 @@ invalid_keyword:
     #endif
 bad:
     return -1;
-}
-
-static void __Pyx_RaiseArgtupleInvalid(
-    const char* func_name,
-    int exact,
-    Py_ssize_t num_min,
-    Py_ssize_t num_max,
-    Py_ssize_t num_found)
-{
-    Py_ssize_t num_expected;
-    const char *more_or_less;
-    if (num_found < num_min) {
-        num_expected = num_min;
-        more_or_less = "at least";
-    } else {
-        num_expected = num_max;
-        more_or_less = "at most";
-    }
-    if (exact) {
-        more_or_less = "exactly";
-    }
-    PyErr_Format(PyExc_TypeError,
-                 "%.200s() takes %.8s %" CYTHON_FORMAT_SSIZE_T "d positional argument%.1s (%" CYTHON_FORMAT_SSIZE_T "d given)",
-                 func_name, more_or_less, num_expected,
-                 (num_expected == 1) ? "" : "s", num_found);
 }
 
 #if CYTHON_COMPILING_IN_CPYTHON
@@ -3140,19 +3423,19 @@ bad:
         return (target_type) value;\
     }
 
-static CYTHON_INLINE char __Pyx_PyInt_As_char(PyObject *x) {
-    const char neg_one = (char) -1, const_zero = (char) 0;
+static CYTHON_INLINE size_t __Pyx_PyInt_As_size_t(PyObject *x) {
+    const size_t neg_one = (size_t) -1, const_zero = (size_t) 0;
     const int is_unsigned = neg_one > const_zero;
 #if PY_MAJOR_VERSION < 3
     if (likely(PyInt_Check(x))) {
-        if (sizeof(char) < sizeof(long)) {
-            __PYX_VERIFY_RETURN_INT(char, long, PyInt_AS_LONG(x))
+        if (sizeof(size_t) < sizeof(long)) {
+            __PYX_VERIFY_RETURN_INT(size_t, long, PyInt_AS_LONG(x))
         } else {
             long val = PyInt_AS_LONG(x);
             if (is_unsigned && unlikely(val < 0)) {
                 goto raise_neg_overflow;
             }
-            return (char) val;
+            return (size_t) val;
         }
     } else
 #endif
@@ -3161,32 +3444,32 @@ static CYTHON_INLINE char __Pyx_PyInt_As_char(PyObject *x) {
 #if CYTHON_USE_PYLONG_INTERNALS
             const digit* digits = ((PyLongObject*)x)->ob_digit;
             switch (Py_SIZE(x)) {
-                case  0: return (char) 0;
-                case  1: __PYX_VERIFY_RETURN_INT(char, digit, digits[0])
+                case  0: return (size_t) 0;
+                case  1: __PYX_VERIFY_RETURN_INT(size_t, digit, digits[0])
                 case 2:
-                    if (8 * sizeof(char) > 1 * PyLong_SHIFT) {
+                    if (8 * sizeof(size_t) > 1 * PyLong_SHIFT) {
                         if (8 * sizeof(unsigned long) > 2 * PyLong_SHIFT) {
-                            __PYX_VERIFY_RETURN_INT(char, unsigned long, (((((unsigned long)digits[1]) << PyLong_SHIFT) | digits[0])))
-                        } else if (8 * sizeof(char) >= 2 * PyLong_SHIFT) {
-                            return (char) (((((char)digits[1]) << PyLong_SHIFT) | digits[0]));
+                            __PYX_VERIFY_RETURN_INT(size_t, unsigned long, (((((unsigned long)digits[1]) << PyLong_SHIFT) | digits[0])))
+                        } else if (8 * sizeof(size_t) >= 2 * PyLong_SHIFT) {
+                            return (size_t) (((((size_t)digits[1]) << PyLong_SHIFT) | digits[0]));
                         }
                     }
                     break;
                 case 3:
-                    if (8 * sizeof(char) > 2 * PyLong_SHIFT) {
+                    if (8 * sizeof(size_t) > 2 * PyLong_SHIFT) {
                         if (8 * sizeof(unsigned long) > 3 * PyLong_SHIFT) {
-                            __PYX_VERIFY_RETURN_INT(char, unsigned long, (((((((unsigned long)digits[2]) << PyLong_SHIFT) | digits[1]) << PyLong_SHIFT) | digits[0])))
-                        } else if (8 * sizeof(char) >= 3 * PyLong_SHIFT) {
-                            return (char) (((((((char)digits[2]) << PyLong_SHIFT) | digits[1]) << PyLong_SHIFT) | digits[0]));
+                            __PYX_VERIFY_RETURN_INT(size_t, unsigned long, (((((((unsigned long)digits[2]) << PyLong_SHIFT) | digits[1]) << PyLong_SHIFT) | digits[0])))
+                        } else if (8 * sizeof(size_t) >= 3 * PyLong_SHIFT) {
+                            return (size_t) (((((((size_t)digits[2]) << PyLong_SHIFT) | digits[1]) << PyLong_SHIFT) | digits[0]));
                         }
                     }
                     break;
                 case 4:
-                    if (8 * sizeof(char) > 3 * PyLong_SHIFT) {
+                    if (8 * sizeof(size_t) > 3 * PyLong_SHIFT) {
                         if (8 * sizeof(unsigned long) > 4 * PyLong_SHIFT) {
-                            __PYX_VERIFY_RETURN_INT(char, unsigned long, (((((((((unsigned long)digits[3]) << PyLong_SHIFT) | digits[2]) << PyLong_SHIFT) | digits[1]) << PyLong_SHIFT) | digits[0])))
-                        } else if (8 * sizeof(char) >= 4 * PyLong_SHIFT) {
-                            return (char) (((((((((char)digits[3]) << PyLong_SHIFT) | digits[2]) << PyLong_SHIFT) | digits[1]) << PyLong_SHIFT) | digits[0]));
+                            __PYX_VERIFY_RETURN_INT(size_t, unsigned long, (((((((((unsigned long)digits[3]) << PyLong_SHIFT) | digits[2]) << PyLong_SHIFT) | digits[1]) << PyLong_SHIFT) | digits[0])))
+                        } else if (8 * sizeof(size_t) >= 4 * PyLong_SHIFT) {
+                            return (size_t) (((((((((size_t)digits[3]) << PyLong_SHIFT) | digits[2]) << PyLong_SHIFT) | digits[1]) << PyLong_SHIFT) | digits[0]));
                         }
                     }
                     break;
@@ -3200,83 +3483,83 @@ static CYTHON_INLINE char __Pyx_PyInt_As_char(PyObject *x) {
             {
                 int result = PyObject_RichCompareBool(x, Py_False, Py_LT);
                 if (unlikely(result < 0))
-                    return (char) -1;
+                    return (size_t) -1;
                 if (unlikely(result == 1))
                     goto raise_neg_overflow;
             }
 #endif
-            if (sizeof(char) <= sizeof(unsigned long)) {
-                __PYX_VERIFY_RETURN_INT_EXC(char, unsigned long, PyLong_AsUnsignedLong(x))
-            } else if (sizeof(char) <= sizeof(unsigned PY_LONG_LONG)) {
-                __PYX_VERIFY_RETURN_INT_EXC(char, unsigned PY_LONG_LONG, PyLong_AsUnsignedLongLong(x))
+            if (sizeof(size_t) <= sizeof(unsigned long)) {
+                __PYX_VERIFY_RETURN_INT_EXC(size_t, unsigned long, PyLong_AsUnsignedLong(x))
+            } else if (sizeof(size_t) <= sizeof(unsigned PY_LONG_LONG)) {
+                __PYX_VERIFY_RETURN_INT_EXC(size_t, unsigned PY_LONG_LONG, PyLong_AsUnsignedLongLong(x))
             }
         } else {
 #if CYTHON_USE_PYLONG_INTERNALS
             const digit* digits = ((PyLongObject*)x)->ob_digit;
             switch (Py_SIZE(x)) {
-                case  0: return (char) 0;
-                case -1: __PYX_VERIFY_RETURN_INT(char, sdigit, -(sdigit) digits[0])
-                case  1: __PYX_VERIFY_RETURN_INT(char,  digit, +digits[0])
+                case  0: return (size_t) 0;
+                case -1: __PYX_VERIFY_RETURN_INT(size_t, sdigit, -(sdigit) digits[0])
+                case  1: __PYX_VERIFY_RETURN_INT(size_t,  digit, +digits[0])
                 case -2:
-                    if (8 * sizeof(char) - 1 > 1 * PyLong_SHIFT) {
+                    if (8 * sizeof(size_t) - 1 > 1 * PyLong_SHIFT) {
                         if (8 * sizeof(unsigned long) > 2 * PyLong_SHIFT) {
-                            __PYX_VERIFY_RETURN_INT(char, long, -(long) (((((unsigned long)digits[1]) << PyLong_SHIFT) | digits[0])))
-                        } else if (8 * sizeof(char) - 1 > 2 * PyLong_SHIFT) {
-                            return (char) -(((((char)digits[1]) << PyLong_SHIFT) | digits[0]));
+                            __PYX_VERIFY_RETURN_INT(size_t, long, -(long) (((((unsigned long)digits[1]) << PyLong_SHIFT) | digits[0])))
+                        } else if (8 * sizeof(size_t) - 1 > 2 * PyLong_SHIFT) {
+                            return (size_t) -(((((size_t)digits[1]) << PyLong_SHIFT) | digits[0]));
                         }
                     }
                     break;
                 case 2:
-                    if (8 * sizeof(char) > 1 * PyLong_SHIFT) {
+                    if (8 * sizeof(size_t) > 1 * PyLong_SHIFT) {
                         if (8 * sizeof(unsigned long) > 2 * PyLong_SHIFT) {
-                            __PYX_VERIFY_RETURN_INT(char, unsigned long, (((((unsigned long)digits[1]) << PyLong_SHIFT) | digits[0])))
-                        } else if (8 * sizeof(char) - 1 > 2 * PyLong_SHIFT) {
-                            return (char) (((((char)digits[1]) << PyLong_SHIFT) | digits[0]));
+                            __PYX_VERIFY_RETURN_INT(size_t, unsigned long, (((((unsigned long)digits[1]) << PyLong_SHIFT) | digits[0])))
+                        } else if (8 * sizeof(size_t) - 1 > 2 * PyLong_SHIFT) {
+                            return (size_t) (((((size_t)digits[1]) << PyLong_SHIFT) | digits[0]));
                         }
                     }
                     break;
                 case -3:
-                    if (8 * sizeof(char) - 1 > 2 * PyLong_SHIFT) {
+                    if (8 * sizeof(size_t) - 1 > 2 * PyLong_SHIFT) {
                         if (8 * sizeof(unsigned long) > 3 * PyLong_SHIFT) {
-                            __PYX_VERIFY_RETURN_INT(char, long, -(long) (((((((unsigned long)digits[2]) << PyLong_SHIFT) | digits[1]) << PyLong_SHIFT) | digits[0])))
-                        } else if (8 * sizeof(char) - 1 > 3 * PyLong_SHIFT) {
-                            return (char) -(((((((char)digits[2]) << PyLong_SHIFT) | digits[1]) << PyLong_SHIFT) | digits[0]));
+                            __PYX_VERIFY_RETURN_INT(size_t, long, -(long) (((((((unsigned long)digits[2]) << PyLong_SHIFT) | digits[1]) << PyLong_SHIFT) | digits[0])))
+                        } else if (8 * sizeof(size_t) - 1 > 3 * PyLong_SHIFT) {
+                            return (size_t) -(((((((size_t)digits[2]) << PyLong_SHIFT) | digits[1]) << PyLong_SHIFT) | digits[0]));
                         }
                     }
                     break;
                 case 3:
-                    if (8 * sizeof(char) > 2 * PyLong_SHIFT) {
+                    if (8 * sizeof(size_t) > 2 * PyLong_SHIFT) {
                         if (8 * sizeof(unsigned long) > 3 * PyLong_SHIFT) {
-                            __PYX_VERIFY_RETURN_INT(char, unsigned long, (((((((unsigned long)digits[2]) << PyLong_SHIFT) | digits[1]) << PyLong_SHIFT) | digits[0])))
-                        } else if (8 * sizeof(char) - 1 > 3 * PyLong_SHIFT) {
-                            return (char) (((((((char)digits[2]) << PyLong_SHIFT) | digits[1]) << PyLong_SHIFT) | digits[0]));
+                            __PYX_VERIFY_RETURN_INT(size_t, unsigned long, (((((((unsigned long)digits[2]) << PyLong_SHIFT) | digits[1]) << PyLong_SHIFT) | digits[0])))
+                        } else if (8 * sizeof(size_t) - 1 > 3 * PyLong_SHIFT) {
+                            return (size_t) (((((((size_t)digits[2]) << PyLong_SHIFT) | digits[1]) << PyLong_SHIFT) | digits[0]));
                         }
                     }
                     break;
                 case -4:
-                    if (8 * sizeof(char) - 1 > 3 * PyLong_SHIFT) {
+                    if (8 * sizeof(size_t) - 1 > 3 * PyLong_SHIFT) {
                         if (8 * sizeof(unsigned long) > 4 * PyLong_SHIFT) {
-                            __PYX_VERIFY_RETURN_INT(char, long, -(long) (((((((((unsigned long)digits[3]) << PyLong_SHIFT) | digits[2]) << PyLong_SHIFT) | digits[1]) << PyLong_SHIFT) | digits[0])))
-                        } else if (8 * sizeof(char) - 1 > 4 * PyLong_SHIFT) {
-                            return (char) -(((((((((char)digits[3]) << PyLong_SHIFT) | digits[2]) << PyLong_SHIFT) | digits[1]) << PyLong_SHIFT) | digits[0]));
+                            __PYX_VERIFY_RETURN_INT(size_t, long, -(long) (((((((((unsigned long)digits[3]) << PyLong_SHIFT) | digits[2]) << PyLong_SHIFT) | digits[1]) << PyLong_SHIFT) | digits[0])))
+                        } else if (8 * sizeof(size_t) - 1 > 4 * PyLong_SHIFT) {
+                            return (size_t) -(((((((((size_t)digits[3]) << PyLong_SHIFT) | digits[2]) << PyLong_SHIFT) | digits[1]) << PyLong_SHIFT) | digits[0]));
                         }
                     }
                     break;
                 case 4:
-                    if (8 * sizeof(char) > 3 * PyLong_SHIFT) {
+                    if (8 * sizeof(size_t) > 3 * PyLong_SHIFT) {
                         if (8 * sizeof(unsigned long) > 4 * PyLong_SHIFT) {
-                            __PYX_VERIFY_RETURN_INT(char, unsigned long, (((((((((unsigned long)digits[3]) << PyLong_SHIFT) | digits[2]) << PyLong_SHIFT) | digits[1]) << PyLong_SHIFT) | digits[0])))
-                        } else if (8 * sizeof(char) - 1 > 4 * PyLong_SHIFT) {
-                            return (char) (((((((((char)digits[3]) << PyLong_SHIFT) | digits[2]) << PyLong_SHIFT) | digits[1]) << PyLong_SHIFT) | digits[0]));
+                            __PYX_VERIFY_RETURN_INT(size_t, unsigned long, (((((((((unsigned long)digits[3]) << PyLong_SHIFT) | digits[2]) << PyLong_SHIFT) | digits[1]) << PyLong_SHIFT) | digits[0])))
+                        } else if (8 * sizeof(size_t) - 1 > 4 * PyLong_SHIFT) {
+                            return (size_t) (((((((((size_t)digits[3]) << PyLong_SHIFT) | digits[2]) << PyLong_SHIFT) | digits[1]) << PyLong_SHIFT) | digits[0]));
                         }
                     }
                     break;
             }
 #endif
-            if (sizeof(char) <= sizeof(long)) {
-                __PYX_VERIFY_RETURN_INT_EXC(char, long, PyLong_AsLong(x))
-            } else if (sizeof(char) <= sizeof(PY_LONG_LONG)) {
-                __PYX_VERIFY_RETURN_INT_EXC(char, PY_LONG_LONG, PyLong_AsLongLong(x))
+            if (sizeof(size_t) <= sizeof(long)) {
+                __PYX_VERIFY_RETURN_INT_EXC(size_t, long, PyLong_AsLong(x))
+            } else if (sizeof(size_t) <= sizeof(PY_LONG_LONG)) {
+                __PYX_VERIFY_RETURN_INT_EXC(size_t, PY_LONG_LONG, PyLong_AsLongLong(x))
             }
         }
         {
@@ -3284,7 +3567,7 @@ static CYTHON_INLINE char __Pyx_PyInt_As_char(PyObject *x) {
             PyErr_SetString(PyExc_RuntimeError,
                             "_PyLong_AsByteArray() not available in PyPy, cannot convert large numbers");
 #else
-            char val;
+            size_t val;
             PyObject *v = __Pyx_PyNumber_Int(x);
  #if PY_MAJOR_VERSION < 3
             if (likely(v) && !PyLong_Check(v)) {
@@ -3304,166 +3587,51 @@ static CYTHON_INLINE char __Pyx_PyInt_As_char(PyObject *x) {
                     return val;
             }
 #endif
-            return (char) -1;
+            return (size_t) -1;
         }
     } else {
-        char val;
+        size_t val;
         PyObject *tmp = __Pyx_PyNumber_Int(x);
-        if (!tmp) return (char) -1;
-        val = __Pyx_PyInt_As_char(tmp);
+        if (!tmp) return (size_t) -1;
+        val = __Pyx_PyInt_As_size_t(tmp);
         Py_DECREF(tmp);
         return val;
     }
 raise_overflow:
     PyErr_SetString(PyExc_OverflowError,
-        "value too large to convert to char");
-    return (char) -1;
+        "value too large to convert to size_t");
+    return (size_t) -1;
 raise_neg_overflow:
     PyErr_SetString(PyExc_OverflowError,
-        "can't convert negative value to char");
-    return (char) -1;
+        "can't convert negative value to size_t");
+    return (size_t) -1;
 }
 
-#if !CYTHON_COMPILING_IN_PYPY && PY_MAJOR_VERSION < 3
-static PyObject *__Pyx_GetStdout(void) {
-    PyObject *f = PySys_GetObject((char *)"stdout");
-    if (!f) {
-        PyErr_SetString(PyExc_RuntimeError, "lost sys.stdout");
-    }
-    return f;
-}
-static int __Pyx_Print(PyObject* f, PyObject *arg_tuple, int newline) {
-    int i;
-    if (!f) {
-        if (!(f = __Pyx_GetStdout()))
-            return -1;
-    }
-    Py_INCREF(f);
-    for (i=0; i < PyTuple_GET_SIZE(arg_tuple); i++) {
-        PyObject* v;
-        if (PyFile_SoftSpace(f, 1)) {
-            if (PyFile_WriteString(" ", f) < 0)
-                goto error;
+static CYTHON_INLINE PyObject* __Pyx_PyInt_From_int(int value) {
+    const int neg_one = (int) -1, const_zero = (int) 0;
+    const int is_unsigned = neg_one > const_zero;
+    if (is_unsigned) {
+        if (sizeof(int) < sizeof(long)) {
+            return PyInt_FromLong((long) value);
+        } else if (sizeof(int) <= sizeof(unsigned long)) {
+            return PyLong_FromUnsignedLong((unsigned long) value);
+        } else if (sizeof(int) <= sizeof(unsigned PY_LONG_LONG)) {
+            return PyLong_FromUnsignedLongLong((unsigned PY_LONG_LONG) value);
         }
-        v = PyTuple_GET_ITEM(arg_tuple, i);
-        if (PyFile_WriteObject(v, f, Py_PRINT_RAW) < 0)
-            goto error;
-        if (PyString_Check(v)) {
-            char *s = PyString_AsString(v);
-            Py_ssize_t len = PyString_Size(v);
-            if (len > 0) {
-                switch (s[len-1]) {
-                    case ' ': break;
-                    case '\f': case '\r': case '\n': case '\t': case '\v':
-                        PyFile_SoftSpace(f, 0);
-                        break;
-                    default:  break;
-                }
-            }
+    } else {
+        if (sizeof(int) <= sizeof(long)) {
+            return PyInt_FromLong((long) value);
+        } else if (sizeof(int) <= sizeof(PY_LONG_LONG)) {
+            return PyLong_FromLongLong((PY_LONG_LONG) value);
         }
     }
-    if (newline) {
-        if (PyFile_WriteString("\n", f) < 0)
-            goto error;
-        PyFile_SoftSpace(f, 0);
+    {
+        int one = 1; int little = (int)*(unsigned char *)&one;
+        unsigned char *bytes = (unsigned char *)&value;
+        return _PyLong_FromByteArray(bytes, sizeof(int),
+                                     little, !is_unsigned);
     }
-    Py_DECREF(f);
-    return 0;
-error:
-    Py_DECREF(f);
-    return -1;
 }
-#else
-static int __Pyx_Print(PyObject* stream, PyObject *arg_tuple, int newline) {
-    PyObject* kwargs = 0;
-    PyObject* result = 0;
-    PyObject* end_string;
-    if (unlikely(!__pyx_print)) {
-        __pyx_print = PyObject_GetAttr(__pyx_b, __pyx_n_s_print);
-        if (!__pyx_print)
-            return -1;
-    }
-    if (stream) {
-        kwargs = PyDict_New();
-        if (unlikely(!kwargs))
-            return -1;
-        if (unlikely(PyDict_SetItem(kwargs, __pyx_n_s_file, stream) < 0))
-            goto bad;
-        if (!newline) {
-            end_string = PyUnicode_FromStringAndSize(" ", 1);
-            if (unlikely(!end_string))
-                goto bad;
-            if (PyDict_SetItem(kwargs, __pyx_n_s_end, end_string) < 0) {
-                Py_DECREF(end_string);
-                goto bad;
-            }
-            Py_DECREF(end_string);
-        }
-    } else if (!newline) {
-        if (unlikely(!__pyx_print_kwargs)) {
-            __pyx_print_kwargs = PyDict_New();
-            if (unlikely(!__pyx_print_kwargs))
-                return -1;
-            end_string = PyUnicode_FromStringAndSize(" ", 1);
-            if (unlikely(!end_string))
-                return -1;
-            if (PyDict_SetItem(__pyx_print_kwargs, __pyx_n_s_end, end_string) < 0) {
-                Py_DECREF(end_string);
-                return -1;
-            }
-            Py_DECREF(end_string);
-        }
-        kwargs = __pyx_print_kwargs;
-    }
-    result = PyObject_Call(__pyx_print, arg_tuple, kwargs);
-    if (unlikely(kwargs) && (kwargs != __pyx_print_kwargs))
-        Py_DECREF(kwargs);
-    if (!result)
-        return -1;
-    Py_DECREF(result);
-    return 0;
-bad:
-    if (kwargs != __pyx_print_kwargs)
-        Py_XDECREF(kwargs);
-    return -1;
-}
-#endif
-
-#if !CYTHON_COMPILING_IN_PYPY && PY_MAJOR_VERSION < 3
-static int __Pyx_PrintOne(PyObject* f, PyObject *o) {
-    if (!f) {
-        if (!(f = __Pyx_GetStdout()))
-            return -1;
-    }
-    Py_INCREF(f);
-    if (PyFile_SoftSpace(f, 0)) {
-        if (PyFile_WriteString(" ", f) < 0)
-            goto error;
-    }
-    if (PyFile_WriteObject(o, f, Py_PRINT_RAW) < 0)
-        goto error;
-    if (PyFile_WriteString("\n", f) < 0)
-        goto error;
-    Py_DECREF(f);
-    return 0;
-error:
-    Py_DECREF(f);
-    return -1;
-    /* the line below is just to avoid C compiler
-     * warnings about unused functions */
-    return __Pyx_Print(f, NULL, 0);
-}
-#else
-static int __Pyx_PrintOne(PyObject* stream, PyObject *o) {
-    int res;
-    PyObject* arg_tuple = PyTuple_Pack(1, o);
-    if (unlikely(!arg_tuple))
-        return -1;
-    res = __Pyx_Print(stream, arg_tuple, 1);
-    Py_DECREF(arg_tuple);
-    return res;
-}
-#endif
 
 static CYTHON_INLINE PyObject* __Pyx_PyInt_From_long(long value) {
     const long neg_one = (long) -1, const_zero = (long) 0;

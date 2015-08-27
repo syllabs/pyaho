@@ -63,7 +63,7 @@ cdef FILE* _open_file(const char* path, const char* mode="r"):
 #
 
 cdef int on_match(int strnum, int textpos, void* context):
-    print "Match"
+    print strnum, textpos
     return 0
 
 

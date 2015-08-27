@@ -64,7 +64,7 @@ ctypedef struct CONTEXT:
 
 cdef int on_match(int strnum, int textpos, CONTEXT* context):
     if context.count >= context.size:
-        context.size = context.size * 2
+        context.size = <size_t>(context.size * 2)
         context.ptr = <int*>realloc(context.ptr, context.size * sizeof (int))
     context.ptr[context.count] = strnum
     context.count += 1
@@ -74,10 +74,7 @@ cdef int on_match(int strnum, int textpos, CONTEXT* context):
 cdef class AhoCorasick:
 
     cdef ACISM* psp
-    cdef list dictionary
-
-    def __init__(self):
-        self.dictionary = []
+    cdef public list dictionary
 
     def __dealloc__(self):
         acism_destroy(self.psp)
@@ -96,7 +93,7 @@ cdef class AhoCorasick:
 
         # Build list of extracted terms
         extracted_terms = [
-            context.ptr[i]
+            self.dictionary[context.ptr[i]]
             for i in range(context.count)
         ]
         free(context.ptr)

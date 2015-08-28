@@ -20,8 +20,18 @@ This package use the same LICENSE as the original C implementation of the librar
 GETTING STARTED
 ---------------
 
-Simply run `python setup.py install` to compile and install `ahocorasick` python module.
-Simple example:
+Clone repository:
+
+```sh
+$ git clone git@bitbucket.org:syllabs/pyaho.git
+$ git submodule init
+$ git submodule update
+```
+
+Then run `python setup.py install` to compile and install `ahocorasick` python module.
+
+EXAMPLE
+-------
 
 ```python
 import ahocorasick

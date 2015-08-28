@@ -1,12 +1,8 @@
 
 from libc.stdio cimport FILE, fopen, fclose
 from libc.stdlib cimport malloc, free, realloc
-from libc.string cimport strlen
 from cpython.string cimport PyString_AsString
 
-
-cdef extern from "tap.h":
-    pass
 
 cdef extern from "msutil.h":
     ctypedef struct MEMBUF:
@@ -21,11 +17,13 @@ cdef extern from "msutil.h":
     MEMREF* refsplit(char* text, char sep, int* pnrefs)
     void    buffree(MEMBUF buf)
 
+
 cdef extern from "_acism.h":
     cdef struct acism:
         pass
 
     ctypedef acism ACISM
+
 
 cdef extern from "acism.h":
     ctypedef int (*ACISM_ACTION)(int strnum, int textpos, void *context)
@@ -50,7 +48,6 @@ cdef FILE* _open_file(const char* path, const char* mode="r"):
     if not pfp:
         raise IOError("Unable to open file: %s" % path)
     return pfp
-
 
 #
 # Processing
@@ -122,17 +119,29 @@ cdef class AhoCorasick:
             self.build_from_string(input_dictionary.read())
 
     def dump(self, path):
+        # We're not able to retrieve the original dictionary after it has
+        # been dumped to disk so this feature is disabled at the moment.
+        raise NotImplemented()
+
         cdef FILE* fp = _open_file(path, "w")
         acism_save(fp, self.psp)
         fclose(fp)
 
     def load(self, path):
+        # We're not able to retrieve the original dictionary after it has
+        # been dumped to disk so this feature is disabled at the moment.
+        raise NotImplemented()
+
         cdef FILE* patterns_file = _open_file(path)
         # Load structure into memory
         self.psp = acism_load(patterns_file)
         fclose(patterns_file)
 
     def mmap(self, path):
+        # We're not able to retrieve the original dictionary after it has
+        # been dumped to disk so this feature is disabled at the moment.
+        raise NotImplemented()
+
         cdef FILE* patterns_file = _open_file(path)
         # MMAP structure into memory
         self.psp = acism_mmap(patterns_file)

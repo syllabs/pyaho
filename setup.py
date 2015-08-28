@@ -34,6 +34,7 @@ setup(
             ],
             include_dirs=[
                 "/usr/local/include/python2.7",
+                "/usr/include/python2.7",
                 "./aho-corasick"
             ],
             libraries=["acism"],

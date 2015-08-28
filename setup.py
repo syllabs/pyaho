@@ -9,7 +9,7 @@ from Cython.Distutils import build_ext
 
 setup(
     name="pyaho",
-    version="0.1",
+    version="0.2",
     description="Wrapper over aho-corasick C library",
     author="Rémi Berson",
     author_email="berson@syllabs.com",

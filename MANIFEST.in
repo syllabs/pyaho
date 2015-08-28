@@ -1,0 +1,9 @@
+recursive-include aho-corasick/ *.c
+recursive-include aho-corasick/ *.h
+include LICENSE
+include Makefile
+include MANIFEST.in
+include README.md
+include ahocorasick.pyx
+include requirements.txt
+include setup.py

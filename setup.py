@@ -36,9 +36,7 @@ setup(
                 "/usr/local/include/python2.7",
                 "/usr/include/python2.7",
                 "./aho-corasick"
-            ],
-            libraries=["acism"],
-            library_dirs=['./aho-corasick']
+            ]
         )
     ]
 )

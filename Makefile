@@ -13,4 +13,5 @@ test: install
 
 clean:
 	@rm -frv build
-	@rm -frv ahocorasick.c
+	@rm -frv dist
+	@rm -fv ahocorasick.c

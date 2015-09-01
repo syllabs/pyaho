@@ -42,7 +42,7 @@ ext = Extension(
 
 setup(
     name="pyaho",
-    version="0.2",
+    version="0.3",
     description="Wrapper over aho-corasick C library",
     author="Rémi Berson",
     author_email="berson@syllabs.com",

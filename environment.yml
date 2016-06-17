@@ -1,0 +1,6 @@
+name: pyaho
+dependencies:
+  - python==2.7.11
+  - pip==7.1.2
+  - pip:
+      - Cython

@@ -1,0 +1,20 @@
+package:
+    name: {{PROJECT_NAME}}
+    version: {{BUILD_VERSION}}
+
+source:
+    path: ..
+
+build:
+    script: pip install . --no-deps
+    number: {{BUILD_NUMBER}}
+
+requirements:
+    build:
+        - python
+
+    run:
+        {{DEPS}}
+
+about:
+    home: http://www.syllabs.com/

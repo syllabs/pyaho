@@ -1,3 +1,6 @@
 [submodule "aho-corasick"]
 	path = aho-corasick
 	url = https://github.com/mischasan/aho-corasick.git
+[submodule "packaging"]
+	path = packaging
+	url = git@bitbucket.org:syllabs/syllabs.packaging.git

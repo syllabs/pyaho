@@ -1,21 +1,16 @@
 pyaho
 =====
 
-Cython wrapper around the very fast aho-corasick C library, written by:
+Cython wrapper around the very fast [aho-corasick](https://github.com/mischasan/aho-corasick) C library, written by:
 
 Mischa Sandberg mischasan@gmail.com
 
 From the original README:
 
 > ACISM is an implementation of Aho-Corasick parallel string search,
-> using an Interleaved State-transition Matrix.
-> It combines the fastest possible Aho-Corasick implementation,
-> with the smallest possible data structure (!).
-
-LICENSE
--------
-
-This package use the same LICENSE as the original C implementation of the library.
+> using an Interleaved State-transition Matrix. It combines the fastest
+> possible Aho-Corasick implementation, with the smallest possible data
+> structure (!).
 
 GETTING STARTED
 ---------------
@@ -28,15 +23,20 @@ $ git submodule init
 $ git submodule update
 ```
 
-Then run `python setup.py install` to compile and install `ahocorasick` python module.
+You need to install `cython` before proceeding to installation:
+```sh
+$ pip install -r requirements.txt
+```
+
+Then run `pip install .` to compile and install `pyaho` python module.
 
 EXAMPLE
 -------
 
 ```python
-import ahocorasick
+import pyaho
 
-aho = ahocorasick.AhoCorasick()
+aho = pyaho.AhoCorasick()
 
 # If `patterns.txt` contains:
 #    fu
@@ -53,3 +53,8 @@ aho.build_from_string("fu\nbar\nbaz")
 matches = aho.process("@('-')@ fu :-) bar baz!")
 # ["fu", "bar", "baz"]
 ```
+
+LICENSE
+-------
+
+This package use the same LICENSE as the original C implementation of the library.

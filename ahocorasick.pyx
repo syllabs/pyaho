@@ -1,7 +1,5 @@
-
 from libc.stdio cimport FILE, fopen, fclose
 from libc.stdlib cimport malloc, free, realloc
-from cpython.string cimport PyString_AsString
 
 
 cdef extern from "msutil.h":
@@ -102,7 +100,7 @@ cdef class AhoCorasick:
         cdef MEMREF* memrefs = <MEMREF *>malloc(len(strings) * sizeof (MEMREF))
         self.dictionary = strings
         for i, string in enumerate(strings):
-            memrefs[i].ptr = PyString_AsString(string)
+            memrefs[i].ptr = string
             memrefs[i].len = len(string)
         self.psp = _build_from_memrefs(memrefs, len(strings))
         free(memrefs)
@@ -115,7 +113,7 @@ cdef class AhoCorasick:
 
     def build_from_file(self, path):
         """Read a """
-        with open(path, "rb") as input_dictionary:
+        with open(path, "rt") as input_dictionary:
             self.build_from_string(input_dictionary.read())
 
     def dump(self, path):
